@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Performance filières</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    
+    
+    
+    
+    
+
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:background 0.4s,border-color 0.4s;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;text-decoration:none;width:calc(100% - 1rem);}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;transition:background 0.4s;}
+    [data-theme="light"] .topbar{background:rgba(240,244,248,0.85);}
+    [data-theme="ocean"] .topbar{background:rgba(2,12,27,0.85);}
+    [data-theme="violet"] .topbar{background:rgba(13,11,26,0.85);}
+    [data-theme="foret"] .topbar{background:rgba(7,21,16,0.85);}
+    [data-theme="rouge"] .topbar{background:rgba(21,8,8,0.85);}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+
+    .content{margin-left:240px;padding:80px 2rem 2rem;min-height:100vh;position:relative;z-index:1;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+
+    .section-hdr{display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;}
+    .section-hdr-line{flex:1;height:1px;background:var(--border);}
+    .section-hdr-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+
+    .charts-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;transition:background 0.4s,border-color 0.4s;}
+    .chart-title{font-size:0.87rem;font-weight:700;margin-bottom:0.2rem;}
+    .chart-sub{font-size:0.68rem;color:var(--text3);margin-bottom:1rem;font-family:'JetBrains Mono',monospace;}
+    canvas{max-height:300px;}
+
+    /* RANKING CARDS */
+    .ranking-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0.85rem;margin-bottom:1.5rem;}
+    .rank-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.2rem;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
+    .rank-card:hover{transform:translateY(-3px);border-color:var(--border2);}
+    .rank-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
+    .rank-card.rank-1::after{background:linear-gradient(90deg,#ffd700,#f59e0b);}
+    .rank-card.rank-2::after{background:linear-gradient(90deg,#94a3b8,#64748b);}
+    .rank-card.rank-3::after{background:linear-gradient(90deg,#cd7f32,#92400e);}
+    .rank-card.rank-other::after{background:var(--border);}
+    .rank-num{font-size:1.5rem;font-weight:800;opacity:0.15;position:absolute;top:0.6rem;right:0.8rem;}
+    .rank-name{font-size:0.87rem;font-weight:700;margin-bottom:0.6rem;}
+    .rank-moy{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent);}
+    .rank-moy-lbl{font-size:0.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;}
+    .rank-stats{display:flex;gap:0.6rem;margin-top:0.6rem;}
+    .rank-stat{font-size:0.68rem;color:var(--text2);}
+    .rank-stat strong{display:block;font-size:0.8rem;font-weight:700;color:var(--text);}
+
+    /* PROGRESS BARS */
+    .bar-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;margin-bottom:1.5rem;}
+    .filiere-row{display:grid;grid-template-columns:130px 1fr 60px 70px;align-items:center;gap:1rem;margin-bottom:1rem;}
+    .filiere-name{font-size:0.82rem;font-weight:600;}
+    .bar-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 1s cubic-bezier(0.34,1.56,0.64,1);}
+    .bar-note{font-family:'JetBrains Mono',monospace;font-size:0.75rem;font-weight:700;text-align:right;}
+    .bar-reussite{font-size:0.72rem;color:var(--text2);text-align:right;}
+
+    /* TABLE */
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1rem;}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .data-table th{padding:0.7rem 1rem;text-align:left;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface);}
+    .data-table td{padding:0.75rem 1rem;border-bottom:1px solid rgba(31,45,74,0.4);}
+    [data-theme="light"] .data-table td{border-bottom-color:rgba(209,220,232,0.6);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--glow);}
+    .badge{display:inline-block;padding:0.2rem 0.55rem;border-radius:6px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;}
+    .badge-success{background:rgba(52,211,153,0.15);color:var(--green);}
+    .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
+    .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
+    .medal{font-size:1.1rem;}
+
+    @media(max-width:1200px){.ranking-grid{grid-template-columns:repeat(3,1fr);}.charts-grid{grid-template-columns:1fr;}}
+  </style>
+<script src="api.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🎓</div>
+    <div class="logo-name">Uni<span>Analytics</span></div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item active" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom">
+    <div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v1.0.0 · PARAEU</div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title">Performance par <span>filière</span></div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1>Performance par filière</h1>
+    <p>Classement et analyse comparative des filières selon la moyenne générale</p>
+  </div>
+
+  <!-- RANKING CARDS -->
+  <div class="section-hdr">
+    <span class="section-hdr-label">Classement général</span>
+    <div class="section-hdr-line"></div>
+  </div>
+  <div class="ranking-grid" id="ranking-grid"></div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Moyennes par filière</div>
+      <div class="chart-sub">Note moyenne /20 · comparaison inter-filières</div>
+      <canvas id="chart-bar"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Taux de réussite</div>
+      <div class="chart-sub">% d'étudiants avec note ≥ 10/20</div>
+      <canvas id="chart-radar"></canvas>
+    </div>
+  </div>
+
+  <!-- PROGRESS BARS -->
+  <div class="section-hdr">
+    <span class="section-hdr-label">Progression des moyennes</span>
+    <div class="section-hdr-line"></div>
+  </div>
+  <div class="bar-section">
+    <div style="display:grid;grid-template-columns:130px 1fr 60px 70px;gap:1rem;margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);">Filière</div>
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);">Progression /20</div>
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);text-align:right;">Moyenne</div>
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);text-align:right;">Réussite</div>
+    </div>
+    <div id="bar-rows"></div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="section-hdr">
+    <span class="section-hdr-label">Tableau détaillé</span>
+    <div class="section-hdr-line"></div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th>Rang</th><th>Filière</th><th>Étudiants</th>
+        <th>Moyenne /20</th><th>Note min</th><th>Note max</th>
+        <th>Taux réussite</th><th>Niveau</th>
+      </tr></thead>
+      <tbody id="perf-body"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+// ─── Données demo (fallback si API offline) ─────────────────────────────────
+const FILIERES_DEMO = [
+  {filiere:"Informatique",  moyenne:13.8, taux_reussite:74, nb_etudiants:38, note_min:6.5,  note_max:19.5},
+  {filiere:"Mathématiques", moyenne:12.1, taux_reussite:61, nb_etudiants:29, note_min:4.0,  note_max:18.0},
+  {filiere:"Physique",      moyenne:11.5, taux_reussite:55, nb_etudiants:24, note_min:3.5,  note_max:17.5},
+  {filiere:"Économie",      moyenne:13.2, taux_reussite:70, nb_etudiants:31, note_min:5.0,  note_max:18.5},
+  {filiere:"Droit",         moyenne:12.8, taux_reussite:65, nb_etudiants:20, note_min:4.5,  note_max:17.0},
+];
+
+// ─── Niveau qualitatif calculé dynamiquement ─────────────────────────────────
+function getNiveau(moy) {
+  if (moy >= 15) return {lbl:'Excellent', cls:'badge-success'};
+  if (moy >= 13) return {lbl:'Très bien', cls:'badge-success'};
+  if (moy >= 11) return {lbl:'Bien',      cls:'badge-warn'};
+  if (moy >= 9)  return {lbl:'Moyen',     cls:'badge-warn'};
+  return               {lbl:'Faible',    cls:'badge-danger'};
+}
+
+// CHARTS
+const cs = getComputedStyle(document.documentElement);
+const accent = cs.getPropertyValue('--accent').trim();
+const accent2 = cs.getPropertyValue('--accent2').trim();
+const green = cs.getPropertyValue('--green').trim();
+const text2 = cs.getPropertyValue('--text2').trim();
+const border = cs.getPropertyValue('--border').trim();
+
+let _perfCharts = {};
+
+function renderPerformance(filieres) {
+  const sorted  = [...filieres].sort((a,b) => b.moyenne - a.moyenne);
+  const medals   = ['🥇','🥈','🥉','',''];
+  const rankClass= ['rank-1','rank-2','rank-3','rank-other','rank-other'];
+  const c        = getChartColors();
+
+  // RANKING CARDS
+  document.getElementById('ranking-grid').innerHTML = sorted.map((f,i) => `
+    <div class="rank-card ${rankClass[i]||'rank-other'}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-name">${medals[i]||''} ${f.filiere}</div>
+      <div class="rank-moy">${f.moyenne.toFixed(1)}</div>
+      <div class="rank-moy-lbl">Moyenne /20</div>
+      <div class="rank-stats">
+        <div class="rank-stat"><strong>${f.taux_reussite}%</strong>Réussite</div>
+        <div class="rank-stat"><strong>${f.nb_etudiants||f.nb_notes||'—'}</strong>Étudiants</div>
+      </div>
+    </div>`).join('');
+
+  // PROGRESS BARS
+  document.getElementById('bar-rows').innerHTML = sorted.map(f => `
+    <div class="filiere-row">
+      <div class="filiere-name">${f.filiere}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(f.moyenne/20)*100}%"></div></div>
+      <div class="bar-note">${f.moyenne.toFixed(1)}/20</div>
+      <div class="bar-reussite">${f.taux_reussite}%</div>
+    </div>`).join('');
+
+  // TABLE
+  document.getElementById('perf-body').innerHTML = sorted.map((f,i) => {
+    const niv = getNiveau(f.moyenne);
+    return `<tr>
+      <td><span class="medal">${medals[i]||'#'+(i+1)}</span></td>
+      <td><strong>${f.filiere}</strong></td>
+      <td>${f.nb_etudiants||f.nb_notes||'—'}</td>
+      <td><strong style="color:var(--accent)">${f.moyenne.toFixed(1)}</strong></td>
+      <td style="color:var(--red)">${f.note_min??'—'}</td>
+      <td style="color:var(--green)">${f.note_max??'—'}</td>
+      <td><span class="badge badge-${f.taux_reussite>=70?'success':f.taux_reussite>=55?'warn':'danger'}">${f.taux_reussite}%</span></td>
+      <td><span class="badge ${niv.cls}">${niv.lbl}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Graphique barre
+  if (_perfCharts.bar) _perfCharts.bar.destroy();
+  _perfCharts.bar = new Chart(document.getElementById('chart-bar'), {
+    type:'bar',
+    data:{labels:sorted.map(f=>f.filiere),datasets:[{
+      data:sorted.map(f=>f.moyenne),
+      backgroundColor:sorted.map((_,i)=>i===0?c.accent:`${c.accent}77`),
+      borderRadius:8,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2035',callbacks:{label:ctx=>`Moyenne : ${ctx.raw}/20`}}},
+      scales:{x:{grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:11}}},
+              y:{grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:11}},min:0,max:20}}},
+  });
+
+  // Graphique radar
+  if (_perfCharts.radar) _perfCharts.radar.destroy();
+  _perfCharts.radar = new Chart(document.getElementById('chart-radar'), {
+    type:'radar',
+    data:{labels:sorted.map(f=>f.filiere),datasets:[{
+      label:'Taux réussite %',
+      data:sorted.map(f=>f.taux_reussite),
+      borderColor:c.green,backgroundColor:`${c.green}22`,
+      pointBackgroundColor:c.green,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      scales:{r:{grid:{color:c.border},ticks:{color:c.text2,font:{family:'JetBrains Mono',size:10},backdropColor:'transparent'},
+                 pointLabels:{color:c.text2,font:{family:'Outfit',size:11}},min:0,max:100}},
+      plugins:{legend:{labels:{color:c.text2,font:{family:'Outfit'}}}}},
+  });
+}
+
+async function loadPerformance() {
+  await checkAPI();
+  let filieres;
+  if (API_OK) {
+    try {
+      const data = await apiGet('/analytics/performance-par-filiere');
+      filieres = data.filieres;
+    } catch(e) { console.warn('API error, fallback démo'); }
+  }
+  if (!filieres || !filieres.length) filieres = FILIERES_DEMO;
+  renderPerformance(filieres);
+}
+
+loadPerformance();
+
+// Rafraîchissement automatique
+if (typeof _bc !== 'undefined' && _bc) {
+  _bc.onmessage = () => loadPerformance();
+}
+
+
+
+</script>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  REQUÊTES SQL — PERFORMANCE PAR FILIÈRE                        ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║                                                                 ║
+  ║  -- Moyennes et stats par filière                               ║
+  ║  SELECT                                                         ║
+  ║    e.filiere,                                                   ║
+  ║    COUNT(DISTINCT e.id)           AS nb_etudiants,              ║
+  ║    ROUND(AVG(r.note)::numeric, 2) AS moyenne,                   ║
+  ║    MIN(r.note)                    AS note_min,                  ║
+  ║    MAX(r.note)                    AS note_max,                  ║
+  ║    ROUND(STDDEV(r.note)::numeric, 2) AS ecart_type,             ║
+  ║    ROUND(COUNT(CASE WHEN r.note >= 10 THEN 1 END)               ║
+  ║      * 100.0 / NULLIF(COUNT(r.id),0), 1) AS taux_reussite       ║
+  ║  FROM etudiants e                                               ║
+  ║  JOIN resultats r ON r.id_etudiant = e.id                       ║
+  ║  GROUP BY e.filiere                                             ║
+  ║  ORDER BY moyenne DESC;                                         ║
+  ║                                                                 ║
+  ║  -- Détail des étudiants d'une filière                          ║
+  ║  SELECT e.nom, e.prenom, e.matricule,                          ║
+  ║    e.niveau_etude, AVG(r.note) AS moyenne                       ║
+  ║  FROM etudiants e                                               ║
+  ║  JOIN resultats r ON r.id_etudiant = e.id                       ║
+  ║  WHERE e.filiere = :filiere                                     ║
+  ║  GROUP BY e.id                                                  ║
+  ║  ORDER BY moyenne DESC;                                         ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+</body>
+</html>

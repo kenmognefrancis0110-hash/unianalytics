@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Recherche Étudiant</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    
+    
+    
+    
+    
+    
+
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:background 0.4s,border-color 0.4s;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;text-decoration:none;width:calc(100% - 1rem);}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;transition:background 0.4s;}
+    [data-theme="light"] .topbar{background:rgba(240,244,248,0.85);}
+    [data-theme="ocean"] .topbar{background:rgba(2,12,27,0.85);}
+    [data-theme="violet"] .topbar{background:rgba(13,11,26,0.85);}
+    [data-theme="foret"] .topbar{background:rgba(7,21,16,0.85);}
+    [data-theme="rouge"] .topbar{background:rgba(21,8,8,0.85);}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+
+    .content{margin-left:240px;padding-top:60px;min-height:100vh;position:relative;z-index:1;padding:80px 2rem 2rem;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+
+    /* SEARCH BOX */
+    .search-hero{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:1.5rem;}
+    .search-hero-title{font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem;}
+    .search-row{display:flex;gap:0.75rem;align-items:center;}
+    .search-big{flex:1;position:relative;}
+    .search-big input{width:100%;padding:0.85rem 1rem 0.85rem 3rem;background:var(--surface);border:2px solid var(--border);border-radius:14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:1rem;transition:border-color 0.2s,box-shadow 0.2s;}
+    .search-big input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--glow);}
+    .search-big input::placeholder{color:var(--text3);}
+    .search-big .sicon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1.1rem;}
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 1.5rem;border-radius:12px;border:none;font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.18s;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);}
+    .btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+    .btn-ghost{background:none;border:1px solid var(--border);color:var(--text2);}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);}
+
+    .filter-row{display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;align-items:center;}
+    .filter-label{font-size:0.72rem;color:var(--text3);margin-right:0.2rem;}
+    .filter-chip{padding:0.35rem 0.85rem;border-radius:99px;border:1px solid var(--border);background:none;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.18s;}
+    .filter-chip:hover{border-color:var(--border2);color:var(--text);}
+    .filter-chip.active{background:var(--glow);border-color:var(--accent);color:var(--accent);}
+
+    /* RESULTS */
+    .results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;}
+    .results-count{font-size:0.82rem;color:var(--text2);}
+    .results-count strong{color:var(--text);}
+
+    .student-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1rem;}
+    .student-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.3rem;display:flex;gap:1rem;align-items:flex-start;transition:transform 0.2s,border-color 0.2s;cursor:pointer;}
+    .student-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+    .student-avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:1.1rem;font-weight:800;color:var(--bg);flex-shrink:0;}
+    .student-body{flex:1;min-width:0;}
+    .student-name{font-size:1rem;font-weight:700;margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .student-chips{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.5rem;}
+    .chip{font-size:0.62rem;padding:0.1rem 0.45rem;border-radius:5px;font-family:'JetBrains Mono',monospace;font-weight:700;}
+    .chip-mat{background:rgba(56,189,248,0.12);color:var(--accent);}
+    .chip-fil{background:rgba(129,140,248,0.12);color:var(--accent2);}
+    .chip-niv{background:rgba(251,191,36,0.12);color:var(--yellow);}
+    .student-stats{display:flex;gap:1rem;}
+    .stat-mini{font-size:0.72rem;color:var(--text2);}
+    .stat-mini strong{display:block;font-size:0.92rem;font-weight:700;}
+    .stat-mini strong.good{color:var(--green);}
+    .stat-mini strong.bad{color:var(--red);}
+    .stat-mini strong.mid{color:var(--yellow);}
+
+    .empty-state{text-align:center;padding:4rem 2rem;color:var(--text3);}
+    .empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;}
+    .empty-state p{font-size:0.9rem;}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+    .overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px var(--shadow);animation:slide-up 0.25s ease;}
+    @keyframes slide-up{from{transform:translateY(24px);opacity:0}}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .modal-title{font-size:1.1rem;font-weight:700;}
+    .modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:1rem;display:grid;place-items:center;transition:background 0.15s;}
+    .modal-close:hover{background:var(--surface);}
+    .modal-avatar{width:72px;height:72px;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:1.8rem;font-weight:800;color:var(--bg);margin:0 auto 1.5rem;}
+    .modal-section{margin-bottom:1.2rem;}
+    .modal-section-title{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;font-size:0.83rem;}
+    .modal-row-lbl{color:var(--text2);}
+    .modal-row-val{font-weight:600;font-family:'JetBrains Mono',monospace;}
+    .badge{display:inline-block;padding:0.2rem 0.55rem;border-radius:6px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;}
+    .badge-success{background:rgba(52,211,153,0.15);color:var(--green);}
+    .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
+    .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
+    .badge-info{background:rgba(56,189,248,0.15);color:var(--accent);}
+
+    #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.8rem 1.3rem;border-radius:12px;font-size:0.83rem;background:var(--card);border:1px solid var(--green);box-shadow:0 8px 32px var(--shadow);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+    #toast.show{transform:translateY(0);opacity:1;}
+  </style>
+<script src="api.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🎓</div>
+    <div class="logo-name">Uni<span>Analytics</span></div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item active" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom">
+    <div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v1.0.0 · PARAEU</div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title">Recherche <span>étudiant</span></div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1>Recherche d'étudiant</h1>
+    <p>Retrouvez un étudiant par nom, prénom ou matricule (format : XXYXXXX)</p>
+  </div>
+
+  <!-- SEARCH HERO -->
+  <div class="search-hero">
+    <div class="search-hero-title">Critères de recherche</div>
+    <div class="search-row">
+      <div class="search-big">
+        <span class="sicon">🔍</span>
+        <input type="text" id="main-search" placeholder="Nom, prénom ou matricule (ex: CM0001, Jean Mbarga)…" oninput="doSearch()">
+      </div>
+      <button class="btn btn-primary" onclick="doSearch()">Rechercher</button>
+      <button class="btn btn-ghost" onclick="clearSearch()">Effacer</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Filière :</span>
+      <button class="filter-chip active" onclick="setFilter('filiere','',this)">Toutes</button>
+      <button class="filter-chip" onclick="setFilter('filiere','Informatique',this)">Informatique</button>
+      <button class="filter-chip" onclick="setFilter('filiere','Mathématiques',this)">Mathématiques</button>
+      <button class="filter-chip" onclick="setFilter('filiere','Physique',this)">Physique</button>
+      <button class="filter-chip" onclick="setFilter('filiere','Économie',this)">Économie</button>
+      <button class="filter-chip" onclick="setFilter('filiere','Droit',this)">Droit</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Niveau :</span>
+      <button class="filter-chip active" onclick="setFilter('niveau','',this)">Tous</button>
+      <button class="filter-chip" onclick="setFilter('niveau','L1',this)">L1</button>
+      <button class="filter-chip" onclick="setFilter('niveau','L2',this)">L2</button>
+      <button class="filter-chip" onclick="setFilter('niveau','L3',this)">L3</button>
+      <button class="filter-chip" onclick="setFilter('niveau','M1',this)">M1</button>
+      <button class="filter-chip" onclick="setFilter('niveau','M2',this)">M2</button>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">Statut :</span>
+      <button class="filter-chip active" onclick="setFilter('statut','',this)">Tous</button>
+      <button class="filter-chip" onclick="setFilter('statut','reussite',this)">✅ En réussite</button>
+      <button class="filter-chip" onclick="setFilter('statut','risque',this)">⚠️ À risque</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-header">
+    <div class="results-count" id="results-count">Affichage de <strong>0</strong> étudiant(s)</div>
+  </div>
+  <div class="student-grid" id="student-grid"></div>
+  <div class="empty-state" id="empty-state" style="display:none">
+    <div class="empty-icon">🔍</div>
+    <p>Aucun étudiant trouvé pour cette recherche.</p>
+  </div>
+</main>
+
+<!-- MODAL FICHE -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── Données demo (fallback) ────────────────────────────────────────────────
+const ETUDIANTS_DEMO = [
+  {id:1,  nom:"Mbarga",    prenom:"Jean-Paul",  matricule:"CM0001", filiere:"Informatique",  niveau:"L3", age:22, annee:2022, moyenne:14.2, presence:87, sessions:42},
+  {id:2,  nom:"Ateba",     prenom:"Sophie",     matricule:"CM0002", filiere:"Mathématiques", niveau:"M1", age:24, annee:2021, moyenne:15.8, presence:95, sessions:55},
+  {id:3,  nom:"Fouda",     prenom:"Alain",      matricule:"CM0007", filiere:"Droit",         niveau:"L2", age:20, annee:2023, moyenne:7.2,  presence:45, sessions:18},
+  {id:4,  nom:"Ndjock",    prenom:"Marie",      matricule:"CM0012", filiere:"Physique",      niveau:"L1", age:19, annee:2024, moyenne:8.1,  presence:52, sessions:21},
+  {id:5,  nom:"Eba",       prenom:"Pierre",     matricule:"CM0019", filiere:"Économie",      niveau:"L2", age:21, annee:2023, moyenne:5.5,  presence:35, sessions:14},
+  {id:6,  nom:"Mvondo",    prenom:"Aicha",      matricule:"CM0033", filiere:"Informatique",  niveau:"L3", age:22, annee:2022, moyenne:6.8,  presence:55, sessions:22},
+  {id:7,  nom:"Atanga",    prenom:"Robert",     matricule:"CM0047", filiere:"Mathématiques", niveau:"M1", age:23, annee:2022, moyenne:9.0,  presence:60, sessions:20},
+  {id:8,  nom:"Biya",      prenom:"Cécile",     matricule:"CM0008", filiere:"Droit",         niveau:"L3", age:21, annee:2022, moyenne:11.5, presence:78, sessions:38},
+  {id:9,  nom:"Nkoa",      prenom:"Emmanuel",   matricule:"CM0015", filiere:"Informatique",  niveau:"M2", age:25, annee:2020, moyenne:16.3, presence:92, sessions:60},
+  {id:10, nom:"Ondoua",    prenom:"Françoise",  matricule:"CM0023", filiere:"Physique",      niveau:"L2", age:20, annee:2023, moyenne:12.7, presence:80, sessions:35},
+  {id:11, nom:"Bella",     prenom:"Samuel",     matricule:"CM0031", filiere:"Économie",      niveau:"M1", age:24, annee:2021, moyenne:13.9, presence:88, sessions:48},
+  {id:12, nom:"Etoundi",   prenom:"Christine",  matricule:"CM0039", filiere:"Informatique",  niveau:"L1", age:18, annee:2024, moyenne:10.4, presence:72, sessions:28},
+];
+
+let filters = { filiere:'', niveau:'', statut:'' };
+
+function getStatut(e){ return e.moyenne >= 10 ? 'reussite' : 'risque'; }
+
+function doSearch() {
+  const q = document.getElementById('main-search').value.trim().toLowerCase();
+  let results = ETUDIANTS.filter(e => {
+    const matchQ = !q ||
+      e.nom.toLowerCase().includes(q) ||
+      e.prenom.toLowerCase().includes(q) ||
+      e.matricule.toLowerCase().includes(q);
+    const matchF = !filters.filiere || e.filiere === filters.filiere;
+    const matchN = !filters.niveau  || e.niveau  === filters.niveau;
+    const matchS = !filters.statut  || getStatut(e) === filters.statut;
+    return matchQ && matchF && matchN && matchS;
+  });
+  renderResults(results);
+}
+
+function renderResults(list) {
+  const grid = document.getElementById('student-grid');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('results-count');
+
+  count.innerHTML = `Affichage de <strong>${list.length}</strong> étudiant(s)`;
+
+  if(!list.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = list.map(e => {
+    const statut = getStatut(e);
+    const cls = statut==='reussite' ? 'good' : statut==='risque' ? 'bad' : 'mid';
+    return `
+    <div class="student-card" onclick="openModal(${e.id})">
+      <div class="student-avatar">${e.nom[0]}${e.prenom[0]}</div>
+      <div class="student-body">
+        <div class="student-name">${e.prenom} ${e.nom}</div>
+        <div class="student-chips">
+          <span class="chip chip-mat">${e.matricule}</span>
+          <span class="chip chip-fil">${e.filiere}</span>
+          <span class="chip chip-niv">${e.niveau}</span>
+        </div>
+        <div class="student-stats">
+          <div class="stat-mini">
+            <strong class="${cls}">${e.moyenne}/20</strong>
+            Moyenne
+          </div>
+          <div class="stat-mini">
+            <strong>${e.presence}%</strong>
+            Présence
+          </div>
+          <div class="stat-mini">
+            <strong>${e.age} ans</strong>
+            Âge
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openModal(id) {
+  const e = ETUDIANTS.find(x => x.id === id);
+  const statut = getStatut(e);
+  document.getElementById('modal-title').textContent = `${e.prenom} ${e.nom}`;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-avatar">${e.nom[0]}${e.prenom[0]}</div>
+    <div class="modal-section">
+      <div class="modal-section-title">Identité & Inscription</div>
+      <div class="modal-row"><span class="modal-row-lbl">Matricule</span><span class="modal-row-val">${e.matricule}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Filière</span><span class="modal-row-val">${e.filiere}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Niveau d'étude</span><span class="modal-row-val">${e.niveau}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Âge</span><span class="modal-row-val">${e.age} ans</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Année d'inscription</span><span class="modal-row-val">${e.annee}</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Performance académique</div>
+      <div class="modal-row"><span class="modal-row-lbl">Moyenne générale</span><span class="modal-row-val" style="color:${statut==='reussite'?'var(--green)':'var(--red)'}">${e.moyenne}/20</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Taux de présence</span><span class="modal-row-val">${e.presence}%</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Sessions d'étude</span><span class="modal-row-val">${e.sessions} séances</span></div>
+      <div class="modal-row">
+        <span class="modal-row-lbl">Statut</span>
+        <span class="badge ${statut==='reussite'?'badge-success':'badge-danger'}">${statut==='reussite'?'✅ En réussite':'⚠️ À risque'}</span>
+      </div>
+    </div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeModal(e) {
+  if(!e || e.target === document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('show');
+}
+
+function setFilter(key, val, btn) {
+  filters[key] = val;
+  btn.closest('.filter-row').querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  doSearch();
+}
+
+function clearSearch() {
+  document.getElementById('main-search').value = '';
+  filters = { filiere:'', niveau:'', statut:'' };
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.filter-row').forEach(row => {
+    const first = row.querySelector('.filter-chip');
+    if(first) first.classList.add('active');
+  });
+  doSearch();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// CHARGEMENT DEPUIS API
+// ═══════════════════════════════════════════════════════════════════════
+let ETUDIANTS = [];
+
+async function loadEtudiants() {
+  await checkAPI();
+  if (API_OK) {
+    try {
+      const raw = await apiGet('/etudiants');
+      // Enrichir avec résultats
+      ETUDIANTS = await Promise.all(raw.map(async e => {
+        const resultats = await apiGet(`/resultats/${e.id_etudiant}`).catch(()=>[]);
+        const sessions  = await apiGet(`/sessions/${e.id_etudiant}`).catch(()=>[]);
+        const moy = resultats.length
+          ? resultats.reduce((s,r)=>s+r.note_examen,0)/resultats.length : 0;
+        const pres = resultats.length
+          ? resultats.reduce((s,r)=>s+r.taux_presence,0)/resultats.length : 0;
+        return {
+          id: e.id_etudiant,
+          nom: e.nom, prenom: e.prenom,
+          matricule: e.matricule || 'CM'+String(e.id_etudiant).padStart(4,'0'),
+          filiere: e.filiere, niveau: e.niveau,
+          age: e.age, annee: e.annee_inscription || 2024,
+          moyenne: Math.round(moy*100)/100,
+          presence: Math.round(pres),
+          sessions: sessions.length,
+          _resultats: resultats
+        };
+      }));
+    } catch(e) { console.warn('API error', e); ETUDIANTS = ETUDIANTS_DEMO; }
+  } else {
+    ETUDIANTS = ETUDIANTS_DEMO;
+  }
+  doSearch();
+}
+
+// Override openModal pour données réelles
+async function openModal(id) {
+  const e = ETUDIANTS.find(x => x.id === id);
+  if (!e) return;
+  const statut = getStatut(e);
+  document.getElementById('modal-title').textContent = `${e.prenom} ${e.nom}`;
+  // Prédiction
+  let predHtml = '';
+  if (API_OK) {
+    try {
+      const pred = await apiGet(`/analytics/prediction/${id}`);
+      if (pred.note_predite !== undefined) {
+        predHtml = `
+          <div class="modal-section">
+            <div class="modal-section-title">Prédiction ML</div>
+            <div class="modal-row">
+              <span class="modal-row-lbl">Note prédite</span>
+              <span class="modal-row-val" style="color:${pred.note_predite>=10?'var(--green)':'var(--red)'}">${pred.note_predite}/20</span>
+            </div>
+            <div class="modal-row"><span class="modal-row-lbl">Mention prédite</span><span class="modal-row-val">${pred.mention_predite}</span></div>
+            ${pred.conseils.map(c=>`<div style="font-size:0.78rem;padding:0.25rem 0;color:var(--text2)">${c}</div>`).join('')}
+          </div>`;
+      }
+    } catch {}
+  }
+  // Résultats
+  const resHtml = e._resultats && e._resultats.length
+    ? `<div class="modal-section">
+        <div class="modal-section-title">Résultats par matière</div>
+        ${e._resultats.map(r=>`
+          <div class="modal-row">
+            <span class="modal-row-lbl">${r.nom_matiere}</span>
+            <span class="badge ${r.note_examen>=10?'badge-success':'badge-danger'}">${r.note_examen}/20</span>
+          </div>`).join('')}
+      </div>` : '';
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-avatar">${e.nom[0]}${e.prenom[0]}</div>
+    <div class="modal-section">
+      <div class="modal-section-title">Identité & Inscription</div>
+      <div class="modal-row"><span class="modal-row-lbl">Matricule</span><span class="modal-row-val">${e.matricule}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Filière</span><span class="modal-row-val">${e.filiere}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Niveau d'étude</span><span class="modal-row-val">${e.niveau}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Âge</span><span class="modal-row-val">${e.age} ans</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Année d'inscription</span><span class="modal-row-val">${e.annee}</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Performance académique</div>
+      <div class="modal-row"><span class="modal-row-lbl">Moyenne générale</span>
+        <span class="modal-row-val" style="color:${statut==='reussite'?'var(--green)':'var(--red)'}">${e.moyenne}/20</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Taux de présence</span><span class="modal-row-val">${e.presence}%</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Sessions d'étude</span><span class="modal-row-val">${e.sessions} séances</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Statut</span>
+        <span class="badge ${statut==='reussite'?'badge-success':'badge-danger'}">${statut==='reussite'?'✅ En réussite':'⚠️ À risque'}</span></div>
+    </div>
+    ${resHtml}
+    ${predHtml}`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+loadEtudiants();
+
+// Rafraîchissement automatique quand d'autres pages modifient les données
+if (typeof _bc !== 'undefined' && _bc) {
+  _bc.onmessage = () => loadEtudiants();
+}
+</script>
+
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  REQUÊTES SQL — RECHERCHE ÉTUDIANT                      ║
+  ╠══════════════════════════════════════════════════════════╣
+  ║                                                          ║
+  ║  -- Recherche par nom/prénom/matricule                   ║
+  ║  SELECT e.id, e.nom, e.prenom, e.matricule,             ║
+  ║    e.filiere, e.niveau_etude, e.age,                    ║
+  ║    e.annee_inscription,                                  ║
+  ║    AVG(r.note) AS moyenne,                               ║
+  ║    COUNT(s.id) AS nb_sessions,                           ║
+  ║    ROUND(COUNT(s.id)*100.0/                              ║
+  ║      NULLIF((SELECT MAX(nb) FROM (                       ║
+  ║        SELECT COUNT(*) as nb FROM sessions_etude         ║
+  ║        GROUP BY id_etudiant) t),0),1) AS presence_pct   ║
+  ║  FROM etudiants e                                        ║
+  ║  LEFT JOIN resultats r ON r.id_etudiant = e.id          ║
+  ║  LEFT JOIN sessions_etude s ON s.id_etudiant = e.id     ║
+  ║  WHERE e.nom ILIKE '%recherche%'                         ║
+  ║     OR e.prenom ILIKE '%recherche%'                      ║
+  ║     OR e.matricule ILIKE '%recherche%'                   ║
+  ║  GROUP BY e.id                                           ║
+  ║  ORDER BY e.nom;                                         ║
+  ║                                                          ║
+  ║  -- Filtrer par filière                                  ║
+  ║  WHERE e.filiere = 'Informatique'                        ║
+  ║                                                          ║
+  ║  -- Filtrer par niveau                                   ║
+  ║  WHERE e.niveau_etude = 'L3'                             ║
+  ║                                                          ║
+  ║  -- Filtrer à risque                                     ║
+  ║  HAVING AVG(r.note) < 10 OR COUNT(s.id) < 25            ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+</body>
+</html>

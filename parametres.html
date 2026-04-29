@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Paramètres</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    
+    
+    
+    
+    
+
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:background 0.4s,border-color 0.4s;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;text-decoration:none;width:calc(100% - 1rem);}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;transition:background 0.4s;}
+    [data-theme="light"] .topbar{background:rgba(240,244,248,0.85);}
+    [data-theme="ocean"] .topbar{background:rgba(2,12,27,0.85);}
+    [data-theme="violet"] .topbar{background:rgba(13,11,26,0.85);}
+    [data-theme="foret"] .topbar{background:rgba(7,21,16,0.85);}
+    [data-theme="rouge"] .topbar{background:rgba(21,8,8,0.85);}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+
+    .content{margin-left:240px;padding:80px 2rem 2rem;min-height:100vh;position:relative;z-index:1;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+
+    .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    .settings-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;transition:background 0.4s,border-color 0.4s;}
+    .settings-card.wide{grid-column:1/-1;}
+    .settings-card h3{font-size:0.9rem;font-weight:700;margin-bottom:0.3rem;}
+    .settings-card p{font-size:0.75rem;color:var(--text2);margin-bottom:1.2rem;}
+
+    /* THEME GRID */
+    .theme-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:0.8rem;}
+    .theme-btn{border:2px solid transparent;border-radius:14px;padding:1rem 0.75rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.5rem;background:var(--surface);transition:all 0.2s;font-family:'Outfit',sans-serif;}
+    .theme-btn:hover{border-color:var(--border2);transform:translateY(-2px);}
+    .theme-btn.selected{border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+    .theme-preview{width:52px;height:32px;border-radius:8px;display:flex;gap:3px;padding:5px;overflow:hidden;}
+    .theme-dot{flex:1;border-radius:4px;}
+    .theme-label{font-size:0.72rem;font-weight:600;color:var(--text2);}
+    .theme-check{font-size:0.65rem;color:var(--accent);font-weight:700;min-height:1rem;}
+
+    /* FORM */
+    .form-group{margin-bottom:1rem;}
+    .form-label{display:block;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text2);margin-bottom:0.4rem;}
+    .form-input{width:100%;padding:0.65rem 0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.87rem;transition:border-color 0.2s,box-shadow 0.2s;}
+    .form-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+    .form-input::placeholder{color:var(--text3);}
+
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.65rem 1.2rem;border-radius:10px;border:none;font-family:'Outfit',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.18s;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);}
+    .btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+    .btn-ghost{background:none;border:1px solid var(--border);color:var(--text2);}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);}
+
+    /* INFO TABLE */
+    .info-table{width:100%;font-size:0.82rem;border-collapse:collapse;}
+    .info-table td{padding:0.5rem 0;border-bottom:1px solid var(--border);}
+    .info-table tr:last-child td{border-bottom:none;}
+    .info-table td:first-child{color:var(--text2);width:140px;}
+    .info-table td:last-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:600;}
+
+    /* SQL SCHEMA */
+    .schema-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.2rem;font-family:'JetBrains Mono',monospace;font-size:0.72rem;line-height:1.9;overflow-x:auto;}
+    .s-kw{color:var(--accent);}
+    .s-type{color:var(--yellow);}
+    .s-cmt{color:var(--text3);}
+    .s-str{color:var(--green);}
+    .schema-title{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.75rem;font-family:'Outfit',sans-serif;}
+
+    #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.8rem 1.3rem;border-radius:12px;font-size:0.83rem;background:var(--card);border:1px solid var(--green);box-shadow:0 8px 32px var(--shadow);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+    #toast.show{transform:translateY(0);opacity:1;}
+    #toast.err{border-color:var(--red);}
+
+    @media(max-width:900px){.settings-grid{grid-template-columns:1fr;}.settings-card.wide{grid-column:1;}}
+  </style>
+<script src="api.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🎓</div>
+    <div class="logo-name">Uni<span>Analytics</span></div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item active" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom">
+    <div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v1.0.0 · PARAEU</div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title"><span>Paramètres</span></div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1>Paramètres</h1>
+    <p>Personnalisation de l'interface et configuration de la base de données</p>
+  </div>
+
+  <div class="settings-grid">
+
+    <!-- THEME -->
+    <div class="settings-card wide">
+      <h3>🎨 Thème de l'interface</h3>
+      <p>Choisissez l'apparence visuelle du tableau de bord</p>
+      <div class="theme-grid">
+        <button class="theme-btn" id="btn-dark" onclick="setTheme('dark',this)">
+          <div class="theme-preview" style="background:#080b12">
+            <div class="theme-dot" style="background:#38bdf8"></div>
+            <div class="theme-dot" style="background:#818cf8"></div>
+            <div class="theme-dot" style="background:#34d399"></div>
+          </div>
+          <span class="theme-label">Sombre</span>
+          <span class="theme-check" id="chk-dark"></span>
+        </button>
+        <button class="theme-btn" id="btn-light" onclick="setTheme('light',this)">
+          <div class="theme-preview" style="background:#f0f4f8">
+            <div class="theme-dot" style="background:#0284c7"></div>
+            <div class="theme-dot" style="background:#6366f1"></div>
+            <div class="theme-dot" style="background:#059669"></div>
+          </div>
+          <span class="theme-label">Clair</span>
+          <span class="theme-check" id="chk-light"></span>
+        </button>
+        <button class="theme-btn" id="btn-ocean" onclick="setTheme('ocean',this)">
+          <div class="theme-preview" style="background:#020c1b">
+            <div class="theme-dot" style="background:#64ffda"></div>
+            <div class="theme-dot" style="background:#ccd6f6"></div>
+            <div class="theme-dot" style="background:#ffd700"></div>
+          </div>
+          <span class="theme-label">Océan</span>
+          <span class="theme-check" id="chk-ocean"></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- API CONFIG -->
+    <div class="settings-card">
+      <h3>🔌 Connexion base de données</h3>
+      <p>URL du serveur FastAPI (backend PostgreSQL)</p>
+      <div class="form-group">
+        <label class="form-label">URL de l'API</label>
+        <input class="form-input" id="api-url" placeholder="http://localhost:8000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nom de la base de données</label>
+        <input class="form-input" id="db-name" placeholder="paraeu_db">
+      </div>
+      <button class="btn btn-primary" onclick="saveConfig()">💾 Enregistrer</button>
+      &nbsp;
+      <button class="btn btn-ghost" onclick="testConnection()">🔍 Tester</button>
+      <div id="db-stats" style="margin-top:1rem"></div>
+      &nbsp;
+      <button class="btn btn-ghost" onclick="testConnection()">🔍 Tester</button>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="settings-card">
+      <h3>ℹ️ À propos</h3>
+      <p>Informations sur l'application PARAEU</p>
+      <table class="info-table">
+        <tr><td>Version</td><td>1.0.0</td></tr>
+        <tr><td>Frontend</td><td>HTML / Chart.js</td></tr>
+        <tr><td>Backend</td><td>FastAPI</td></tr>
+        <tr><td>Base de données</td><td>PostgreSQL</td></tr>
+        <tr><td>Analyse</td><td>Pandas / Scikit-Learn</td></tr>
+        <tr><td>Polices</td><td>Outfit + JetBrains Mono</td></tr>
+      </table>
+    </div>
+
+    <!-- SQL SCHEMA 
+    <div class="settings-card wide">
+      <h3>🗄️ Schéma de base de données</h3>
+      <p>Tables SQL nécessaires au fonctionnement du système PARAEU</p>
+      <div class="schema-box">
+        <div class="schema-title">Schéma PostgreSQL complet</div>
+
+<span class="s-cmt">-- Table principale des étudiants actifs</span>
+<span class="s-kw">CREATE TABLE</span> etudiants (
+  id                 <span class="s-type">SERIAL PRIMARY KEY</span>,
+  matricule          <span class="s-type">VARCHAR(10)</span>  <span class="s-kw">UNIQUE NOT NULL</span>,
+  nom                <span class="s-type">VARCHAR(100)</span> <span class="s-kw">NOT NULL</span>,
+  prenom             <span class="s-type">VARCHAR(100)</span> <span class="s-kw">NOT NULL</span>,
+  filiere            <span class="s-type">VARCHAR(50)</span>  <span class="s-kw">NOT NULL</span>,
+  niveau_etude       <span class="s-type">VARCHAR(5)</span>   <span class="s-kw">NOT NULL</span>, <span class="s-cmt">-- L1,L2,L3,M1,M2</span>
+  age                <span class="s-type">INTEGER</span>,
+  annee_inscription  <span class="s-type">INTEGER</span>,
+  statut             <span class="s-type">VARCHAR(10)</span>  <span class="s-kw">DEFAULT</span> <span class="s-str">'actif'</span>, <span class="s-cmt">-- actif|ancien</span>
+  created_at         <span class="s-type">TIMESTAMP</span>    <span class="s-kw">DEFAULT NOW()</span>
+);
+
+<span class="s-cmt">-- Sessions d'étude individuelles</span>
+<span class="s-kw">CREATE TABLE</span> sessions_etude (
+  id               <span class="s-type">SERIAL PRIMARY KEY</span>,
+  id_etudiant      <span class="s-type">INTEGER</span> <span class="s-kw">REFERENCES</span> etudiants(id),
+  date_session     <span class="s-type">DATE</span>    <span class="s-kw">NOT NULL</span>,
+  heures_etude     <span class="s-type">NUMERIC(4,2)</span>,
+  heures_sommeil   <span class="s-type">NUMERIC(4,2)</span>,
+  humeur           <span class="s-type">INTEGER</span>  <span class="s-kw">CHECK</span>(humeur <span class="s-kw">BETWEEN</span> 1 <span class="s-kw">AND</span> 5)
+);
+
+<span class="s-cmt">-- Résultats d'examens par matière</span>
+<span class="s-kw">CREATE TABLE</span> resultats (
+  id              <span class="s-type">SERIAL PRIMARY KEY</span>,
+  id_etudiant     <span class="s-type">INTEGER</span>      <span class="s-kw">REFERENCES</span> etudiants(id),
+  code_matiere    <span class="s-type">VARCHAR(10)</span>  <span class="s-kw">NOT NULL</span>,
+  nom_matiere     <span class="s-type">VARCHAR(100)</span>,
+  note            <span class="s-type">NUMERIC(4,2)</span> <span class="s-kw">CHECK</span>(note <span class="s-kw">BETWEEN</span> 0 <span class="s-kw">AND</span> 20),
+  taux_presence   <span class="s-type">INTEGER</span>      <span class="s-kw">CHECK</span>(taux_presence <span class="s-kw">BETWEEN</span> 0 <span class="s-kw">AND</span> 100),
+  session         <span class="s-type">VARCHAR(15)</span>  <span class="s-kw">DEFAULT</span> <span class="s-str">'S1'</span>, <span class="s-cmt">-- S1|S2|rattrapage</span>
+  <span class="s-kw">UNIQUE</span>(id_etudiant, code_matiere, session)
+);
+
+<span class="s-cmt">-- Historique des anciens étudiants</span>
+<span class="s-kw">CREATE TABLE</span> anciens_etudiants (
+  id              <span class="s-type">SERIAL PRIMARY KEY</span>,
+  id_etudiant     <span class="s-type">INTEGER</span>      <span class="s-kw">REFERENCES</span> etudiants(id),
+  annee_depart    <span class="s-type">INTEGER</span>,
+  cause_depart    <span class="s-type">VARCHAR(20)</span>  <span class="s-kw">CHECK</span>(cause_depart <span class="s-kw">IN</span> (
+                    <span class="s-str">'fin_parcours'</span>, <span class="s-str">'abandon'</span>, <span class="s-str">'echec_scolaire'</span>)),
+  commentaire     <span class="s-type">TEXT</span>,
+  enregistre_le   <span class="s-type">TIMESTAMP</span>    <span class="s-kw">DEFAULT NOW()</span>
+);
+
+<span class="s-cmt">-- Séquence pour les matricules auto</span>
+<span class="s-kw">CREATE SEQUENCE</span> seq_matricule <span class="s-kw">START</span> 1;
+
+<span class="s-cmt">-- Index de performance</span>
+<span class="s-kw">CREATE INDEX</span> idx_etudiant_filiere <span class="s-kw">ON</span> etudiants(filiere);
+<span class="s-kw">CREATE INDEX</span> idx_resultats_etudiant <span class="s-kw">ON</span> resultats(id_etudiant);
+<span class="s-kw">CREATE INDEX</span> idx_anciens_cause <span class="s-kw">ON</span> anciens_etudiants(cause_depart);
+      </div>
+    </div>
+
+  </div>
+</main>
+-->
+<div id="toast"></div>
+
+<script>
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('api-url').value = localStorage.getItem('api_url') || 'http://localhost:8000';
+document.getElementById('db-name').value = localStorage.getItem('db_name') || 'paraeu_db';
+
+function updateThemeUI(theme) {
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-' + theme).classList.add('selected');
+  ['dark','light','ocean','violet','foret','rouge'].forEach(t => {
+    document.getElementById('chk-'+t).textContent = t === theme ? '✓ Actif' : '';
+  });
+}
+
+function setTheme(theme, btn) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  updateThemeUI(theme);
+  // Propager le thème à toutes les pages
+  toast('✅ Thème "' + {dark:'Sombre',light:'Clair',ocean:'Océan'}[theme] + '" appliqué');
+}
+
+function saveConfig() {
+  localStorage.setItem('api_url', document.getElementById('api-url').value);
+  localStorage.setItem('db_name', document.getElementById('db-name').value);
+  toast('✅ Configuration enregistrée');
+}
+
+async function testConnection() {
+  const url = document.getElementById('api-url').value.trim();
+  toast('🔍 Test de connexion vers ' + url + '…');
+  try {
+    const r = await fetch(url + '/ping', { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      const d = await r.json();
+      toast('✅ Connexion réussie ! DB: ' + (d.db||'OK'));
+    } else {
+      toast('⚠️ Serveur répond avec erreur HTTP ' + r.status, true);
+    }
+  } catch(e) {
+    toast('❌ Hors ligne — lance : uvicorn main:app --reload --port 8000', true);
+  }
+}
+
+async function chargerStats() {
+  try {
+    const r = await fetch((localStorage.getItem('api_url')||'http://localhost:8000') + '/analytics/resume',
+      {signal:AbortSignal.timeout(2000)});
+    if (r.ok) {
+      const d = await r.json();
+      const statsEl = document.getElementById('db-stats');
+      if (statsEl) statsEl.innerHTML = `
+        <div style="background:var(--surface);border-radius:10px;padding:1rem;font-size:0.82rem;color:var(--text2)">
+          <div>👥 <strong style="color:var(--text)">${d.nb_etudiants}</strong> étudiants</div>
+          <div>📝 <strong style="color:var(--text)">${d.nb_resultats}</strong> résultats</div>
+          <div>📊 Moyenne : <strong style="color:var(--accent)">${d.moyenne_generale}/20</strong></div>
+          <div>✅ Réussite : <strong style="color:var(--green)">${d.taux_reussite}%</strong></div>
+        </div>`;
+    }
+  } catch {}
+}
+
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (err?' err':'');
+  setTimeout(() => t.className = '', 3500);
+}
+
+updateThemeUI(savedTheme);
+chargerStats();
+</script>
+</body>
+</html>

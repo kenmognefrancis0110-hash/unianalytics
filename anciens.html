@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Anciens étudiants</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    
+    
+    
+    
+    
+
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:background 0.4s,border-color 0.4s;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;text-decoration:none;width:calc(100% - 1rem);}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;transition:background 0.4s;}
+    [data-theme="light"] .topbar{background:rgba(240,244,248,0.85);}
+    [data-theme="ocean"] .topbar{background:rgba(2,12,27,0.85);}
+    [data-theme="violet"] .topbar{background:rgba(13,11,26,0.85);}
+    [data-theme="foret"] .topbar{background:rgba(7,21,16,0.85);}
+    [data-theme="rouge"] .topbar{background:rgba(21,8,8,0.85);}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+
+    .content{margin-left:240px;padding:80px 2rem 2rem;min-height:100vh;position:relative;z-index:1;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+
+    .section-hdr{display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;}
+    .section-hdr-line{flex:1;height:1px;background:var(--border);}
+    .section-hdr-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+    .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.4rem;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s;}
+    .kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);}
+    .kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+    .kpi-card.blue::after{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+    .kpi-card.green::after{background:linear-gradient(90deg,var(--green),#10b981);}
+    .kpi-card.red::after{background:linear-gradient(90deg,var(--red),#f43f5e);}
+    .kpi-card.yellow::after{background:linear-gradient(90deg,var(--yellow),#f59e0b);}
+    .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;}
+    .kpi-icon{font-size:1.3rem;opacity:0.8;}
+    .kpi-label{font-size:0.68rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2);margin-bottom:0.35rem;}
+    .kpi-value{font-size:2rem;font-weight:800;letter-spacing:-0.04em;line-height:1;}
+    .kpi-value.c-blue{color:var(--accent);}
+    .kpi-value.c-green{color:var(--green);}
+    .kpi-value.c-red{color:var(--red);}
+    .kpi-value.c-yellow{color:var(--yellow);}
+    .kpi-sub{font-size:0.7rem;color:var(--text3);margin-top:0.35rem;font-family:'JetBrains Mono',monospace;}
+
+    /* CHARTS */
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;}
+    .chart-title{font-size:0.87rem;font-weight:700;margin-bottom:0.2rem;}
+    .chart-sub{font-size:0.68rem;color:var(--text3);margin-bottom:1rem;font-family:'JetBrains Mono',monospace;}
+    canvas{max-height:260px;}
+    .pie-wrap{display:flex;align-items:center;gap:1.5rem;}
+    .pie-wrap canvas{max-height:200px;max-width:200px;flex-shrink:0;}
+    .pie-legend{flex:1;}
+    .legend-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:0.8rem;}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .legend-lbl{font-size:0.75rem;color:var(--text2);}
+    .legend-val{font-size:1rem;font-weight:700;}
+
+    /* FILTERS */
+    .filter-bar{display:flex;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+    .filter-chip{padding:0.35rem 0.85rem;border-radius:99px;border:1px solid var(--border);background:none;font-family:'Outfit',sans-serif;font-size:0.78rem;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.18s;}
+    .filter-chip:hover{border-color:var(--border2);color:var(--text);}
+    .filter-chip.active{background:var(--glow);border-color:var(--accent);color:var(--accent);}
+
+    /* TABLE */
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1.5rem;}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .data-table th{padding:0.7rem 1rem;text-align:left;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface);}
+    .data-table td{padding:0.75rem 1rem;border-bottom:1px solid rgba(31,45,74,0.4);}
+    [data-theme="light"] .data-table td{border-bottom-color:rgba(209,220,232,0.6);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--glow);}
+    .badge{display:inline-block;padding:0.2rem 0.55rem;border-radius:6px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:0.04em;}
+    .badge-success{background:rgba(52,211,153,0.15);color:var(--green);}
+    .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
+    .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
+    .badge-info{background:rgba(56,189,248,0.15);color:var(--accent);}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+    .overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px var(--shadow);animation:slide-up 0.25s ease;}
+    @keyframes slide-up{from{transform:translateY(24px);opacity:0}}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .modal-title{font-size:1.05rem;font-weight:700;}
+    .modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:1rem;display:grid;place-items:center;transition:background 0.15s;}
+    .modal-close:hover{background:var(--surface);}
+    .modal-section{margin-bottom:1.2rem;}
+    .modal-section-title{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0;font-size:0.83rem;}
+    .modal-row-lbl{color:var(--text2);}
+    .modal-row-val{font-weight:600;font-family:'JetBrains Mono',monospace;}
+    .cause-banner{border-radius:12px;padding:1rem;margin-bottom:1rem;text-align:center;}
+    .cause-banner.fin{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);}
+    .cause-banner.abandon{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);}
+    .cause-banner.echec{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);}
+    .cause-banner .cause-icon{font-size:2rem;display:block;margin-bottom:0.3rem;}
+    .cause-banner .cause-lbl{font-size:0.85rem;font-weight:700;}
+
+    @media(max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.charts-grid{grid-template-columns:1fr;}}
+  </style>
+<script src="api.js"></script>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🎓</div>
+    <div class="logo-name">Uni<span>Analytics</span></div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item active" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom">
+    <div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v1.0.0 · PARAEU</div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title">Anciens <span>étudiants</span></div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1>Anciens étudiants</h1>
+    <p>Historique complet des départs et analyse des causes de sortie</p>
+  </div>
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-top"><span class="kpi-icon">👥</span></div>
+      <div class="kpi-label">Total anciens</div>
+      <div class="kpi-value c-blue" id="kpi-total">—</div>
+      <div class="kpi-sub">tous départs confondus</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-top"><span class="kpi-icon">🎓</span></div>
+      <div class="kpi-label">Fin de parcours</div>
+      <div class="kpi-value c-green" id="kpi-fin">—</div>
+      <div class="kpi-sub">diplômés</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-top"><span class="kpi-icon">🚪</span></div>
+      <div class="kpi-label">Abandons</div>
+      <div class="kpi-value c-yellow" id="kpi-abandon">—</div>
+      <div class="kpi-sub">départ volontaire</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-top"><span class="kpi-icon">❌</span></div>
+      <div class="kpi-label">Échecs scolaires</div>
+      <div class="kpi-value c-red" id="kpi-echec">—</div>
+      <div class="kpi-sub">exclusion académique</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Répartition des causes de départ</div>
+      <div class="chart-sub">Distribution par motif · tous départs</div>
+      <div class="pie-wrap">
+        <canvas id="chart-causes"></canvas>
+        <div class="pie-legend">
+          <div class="legend-row">
+            <div class="legend-dot" style="background:var(--green)"></div>
+            <div><div class="legend-lbl">Fin de parcours</div><div class="legend-val" style="color:var(--green)" id="leg-fin">—</div></div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:var(--yellow)"></div>
+            <div><div class="legend-lbl">Abandon</div><div class="legend-val" style="color:var(--yellow)" id="leg-abandon">—</div></div>
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:var(--red)"></div>
+            <div><div class="legend-lbl">Échec scolaire</div><div class="legend-val" style="color:var(--red)" id="leg-echec">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Départs par promotion</div>
+      <div class="chart-sub">Évolution annuelle des sorties</div>
+      <canvas id="chart-promos"></canvas>
+    </div>
+  </div>
+
+  <!-- FILTERS + TABLE -->
+  <div class="section-hdr">
+    <span class="section-hdr-label">Registre des anciens étudiants</span>
+    <div class="section-hdr-line"></div>
+  </div>
+  <div class="filter-bar">
+    <button class="filter-chip active" onclick="filterAlumni('all',this)">Tous</button>
+    <button class="filter-chip" onclick="filterAlumni('fin_parcours',this)">🎓 Fin de parcours</button>
+    <button class="filter-chip" onclick="filterAlumni('abandon',this)">🚪 Abandon</button>
+    <button class="filter-chip" onclick="filterAlumni('echec_scolaire',this)">❌ Échec scolaire</button>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th>Étudiant</th><th>Matricule</th><th>Filière</th>
+        <th>Promotion</th><th>Cause de départ</th><th>Détails</th>
+      </tr></thead>
+      <tbody id="alumni-body"></tbody>
+    </table>
+  </div>
+</main>
+
+<!-- MODAL DÉTAIL -->
+<div class="overlay" id="overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modal-title">Fiche ancien étudiant</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ─── Données demo (fallback si API hors ligne) ─────────────────────────────
+const ALUMNI_DEMO = [
+  {id:1,  nom:"Jean Mbarga",     matricule:"CM0002", filiere:"Informatique",  promo:"2022", cause:"fin_parcours",  note:"Diplômé avec mention Bien", moy:14.2},
+  {id:2,  nom:"Cécile Biya",     matricule:"CM0008", filiere:"Droit",         promo:"2022", cause:"abandon",       note:"Raisons personnelles — déménagement", moy:11.5},
+  {id:3,  nom:"Thomas Ondo",     matricule:"CM0011", filiere:"Physique",      promo:"2021", cause:"echec_scolaire",note:"Moyenne générale insuffisante après 2 rattrapages", moy:6.2},
+  {id:4,  nom:"Lucie Mekongo",   matricule:"CM0017", filiere:"Économie",      promo:"2023", cause:"fin_parcours",  note:"Diplômée — orientation professionnelle", moy:15.1},
+  {id:5,  nom:"Eric Owona",      matricule:"CM0024", filiere:"Mathématiques", promo:"2022", cause:"abandon",       note:"Engagement professionnel anticipé", moy:10.8},
+];
+
+let ALUMNI = [];
+let currentFilter = 'all';
+let _alCharts = {};
+
+// ─── Badges ──────────────────────────────────────────────────────────────────
+function getCauseBadge(cause) {
+  if(cause==='fin_parcours')   return '<span class="badge badge-success">🎓 Fin de parcours</span>';
+  if(cause==='abandon')        return '<span class="badge badge-warn">🚪 Abandon</span>';
+  if(cause==='echec_scolaire') return '<span class="badge badge-danger">❌ Échec scolaire</span>';
+  return cause;
+}
+
+// ─── Tableau ─────────────────────────────────────────────────────────────────
+function renderTableFull(filter) {
+  const list = filter==='all' ? ALUMNI : ALUMNI.filter(a=>a.cause===filter);
+  document.getElementById('alumni-body').innerHTML = list.length ? list.map(a => `
+    <tr style="cursor:pointer" onclick="openModal(${a.id})">
+      <td><strong>${a.nom}</strong></td>
+      <td><span class="badge badge-info">${a.matricule||'—'}</span></td>
+      <td>${a.filiere||'—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">${a.promo||'—'}</td>
+      <td>${getCauseBadge(a.cause)}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.75rem;color:var(--text2)">${a.note||'—'}</td>
+    </tr>`).join('')
+    : '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text3)">Aucun résultat</td></tr>';
+}
+
+function filterAlumni(cause, btn) {
+  currentFilter = cause;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTableFull(cause);
+}
+
+// ─── Modal détail ─────────────────────────────────────────────────────────────
+function openModal(id) {
+  const a = ALUMNI.find(x=>x.id===id);
+  if (!a) return;
+  const causeInfo = {
+    fin_parcours:  {icon:'🎓',label:'Fin de parcours',  cls:'fin',    color:'var(--green)'},
+    abandon:       {icon:'🚪',label:'Abandon volontaire',cls:'abandon',color:'var(--yellow)'},
+    echec_scolaire:{icon:'❌',label:'Échec scolaire',    cls:'echec',  color:'var(--red)'},
+  }[a.cause] || {icon:'?',label:a.cause,cls:'fin',color:'var(--text)'};
+  document.getElementById('modal-title').textContent = a.nom;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="cause-banner ${causeInfo.cls}">
+      <span class="cause-icon">${causeInfo.icon}</span>
+      <div class="cause-lbl" style="color:${causeInfo.color}">${causeInfo.label}</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Identité</div>
+      <div class="modal-row"><span class="modal-row-lbl">Matricule</span><span class="modal-row-val">${a.matricule||'—'}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Filière</span><span class="modal-row-val">${a.filiere||'—'}</span></div>
+      <div class="modal-row"><span class="modal-row-lbl">Promotion</span><span class="modal-row-val">${a.promo||'—'}</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Départ</div>
+      <div class="modal-row"><span class="modal-row-lbl">Cause</span>${getCauseBadge(a.cause)}</div>
+      <div class="modal-row"><span class="modal-row-lbl">Dernière moyenne</span>
+        <span class="modal-row-val" style="color:${(a.moy||0)>=10?'var(--green)':'var(--red)'}">${a.moy||'—'}/20</span></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-title">Commentaire</div>
+      <div style="font-size:0.82rem;color:var(--text2);line-height:1.6;padding:0.5rem 0">${a.note||'Aucun commentaire'}</div>
+    </div>`;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeModal(e) {
+  if(!e || e.target===document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('show');
+}
+
+// ─── Graphiques ───────────────────────────────────────────────────────────────
+function buildAlumniCharts(fin, abandon, echec) {
+  const c = getChartColors();
+  if(_alCharts.causes) _alCharts.causes.destroy();
+  _alCharts.causes = new Chart(document.getElementById('chart-causes'), {
+    type:'doughnut',
+    data:{labels:['Fin de parcours','Abandon','Échec scolaire'],
+      datasets:[{data:[fin,abandon,echec],backgroundColor:[c.green,c.yellow,c.red],borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false}}},
+  });
+
+  const promos = [...new Set(ALUMNI.map(a=>a.promo).filter(Boolean))].sort();
+  const promoLabels = promos.length ? promos : ['2021','2022','2023'];
+  const byPromo = promoLabels.map(p => {
+    const items = ALUMNI.filter(a=>a.promo===p);
+    return {
+      fin:    items.filter(a=>a.cause==='fin_parcours').length,
+      abandon:items.filter(a=>a.cause==='abandon').length,
+      echec:  items.filter(a=>a.cause==='echec_scolaire').length,
+    };
+  });
+  if(_alCharts.promos) _alCharts.promos.destroy();
+  _alCharts.promos = new Chart(document.getElementById('chart-promos'), {
+    type:'bar',
+    data:{labels:promoLabels, datasets:[
+      {label:'Fin de parcours',data:byPromo.map(x=>x.fin),backgroundColor:`${c.green}99`,borderRadius:4,borderSkipped:false},
+      {label:'Abandon',        data:byPromo.map(x=>x.abandon),backgroundColor:`${c.yellow}99`,borderRadius:4,borderSkipped:false},
+      {label:'Échec',          data:byPromo.map(x=>x.echec),backgroundColor:`${c.red}99`,borderRadius:4,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{labels:{color:c.text2,font:{family:'Outfit',size:11}}}},
+      scales:{x:{stacked:true,grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:10}}},
+              y:{stacked:true,grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:10}},min:0}}},
+  });
+}
+
+// ─── Chargement API ───────────────────────────────────────────────────────────
+async function loadAnciens() {
+  await checkAPI();
+  if (API_OK) {
+    try {
+      const data = await apiGet('/anciens');
+      ALUMNI = data.anciens || [];
+    } catch(e) { console.warn('Fallback démo:', e); }
+  }
+  if (!ALUMNI.length) ALUMNI = ALUMNI_DEMO;
+
+  const fin    = ALUMNI.filter(a=>a.cause==='fin_parcours').length;
+  const abandon= ALUMNI.filter(a=>a.cause==='abandon').length;
+  const echec  = ALUMNI.filter(a=>a.cause==='echec_scolaire').length;
+  const total  = ALUMNI.length;
+
+  // KPIs
+  document.getElementById('kpi-total').textContent   = total;
+  document.getElementById('kpi-fin').textContent     = fin;
+  document.getElementById('kpi-abandon').textContent = abandon;
+  document.getElementById('kpi-echec').textContent   = echec;
+  const pct = n => total ? Math.round(n*100/total)+'%' : '0%';
+  document.getElementById('leg-fin').textContent     = pct(fin);
+  document.getElementById('leg-abandon').textContent = pct(abandon);
+  document.getElementById('leg-echec').textContent   = pct(echec);
+
+  buildAlumniCharts(fin, abandon, echec);
+  renderTableFull(currentFilter);
+}
+
+loadAnciens();
+
+// Rafraîchissement automatique
+if (typeof _bc !== 'undefined' && _bc) {
+  _bc.onmessage = () => loadAnciens();
+}
+</script>
+
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  REQUÊTES SQL — ANCIENS ÉTUDIANTS                               ║
+  ╠══════════════════════════════════════════════════════════════════╣
+  ║                                                                 ║
+  ║  -- Liste complète des anciens étudiants                        ║
+  ║  SELECT ae.id, e.nom, e.prenom, e.matricule,                    ║
+  ║    e.filiere, ae.annee_depart, ae.cause_depart,                 ║
+  ║    ae.commentaire,                                              ║
+  ║    AVG(r.note) AS derniere_moyenne                              ║
+  ║  FROM anciens_etudiants ae                                      ║
+  ║  JOIN etudiants e ON e.id = ae.id_etudiant                     ║
+  ║  LEFT JOIN resultats r ON r.id_etudiant = e.id                  ║
+  ║  GROUP BY ae.id, e.id                                           ║
+  ║  ORDER BY ae.annee_depart DESC;                                 ║
+  ║                                                                 ║
+  ║  -- Filtrer par cause de départ                                 ║
+  ║  WHERE ae.cause_depart = 'fin_parcours'   -- ou                 ║
+  ║  WHERE ae.cause_depart = 'abandon'        -- ou                 ║
+  ║  WHERE ae.cause_depart = 'echec_scolaire'                       ║
+  ║                                                                 ║
+  ║  -- KPIs de synthèse                                            ║
+  ║  SELECT                                                         ║
+  ║    COUNT(*) AS total,                                           ║
+  ║    COUNT(CASE WHEN cause_depart='fin_parcours'   THEN 1 END),   ║
+  ║    COUNT(CASE WHEN cause_depart='abandon'        THEN 1 END),   ║
+  ║    COUNT(CASE WHEN cause_depart='echec_scolaire' THEN 1 END)    ║
+  ║  FROM anciens_etudiants;                                        ║
+  ║                                                                 ║
+  ║  -- Enregistrer un départ                                       ║
+  ║  INSERT INTO anciens_etudiants                                  ║
+  ║    (id_etudiant, annee_depart, cause_depart, commentaire)       ║
+  ║  VALUES (:id, :annee, :cause, :commentaire);                    ║
+  ║                                                                 ║
+  ║  -- Supprimer l'étudiant des actifs                             ║
+  ║  UPDATE etudiants SET statut = 'ancien'                         ║
+  ║  WHERE id = :id;                                                ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
+</body>
+</html>

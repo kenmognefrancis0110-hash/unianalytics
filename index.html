@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Tableau de Bord</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:background 0.4s,border-color 0.4s;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;flex-shrink:0;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;cursor:pointer;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;border:none;background:none;width:calc(100% - 1rem);text-align:left;text-decoration:none;}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+
+    /* TOPBAR */
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;transition:background 0.4s,border-color 0.4s;}
+    [data-theme="light"] .topbar{background:rgba(240,244,248,0.85);}
+    [data-theme="ocean"] .topbar{background:rgba(2,12,27,0.85);}
+    [data-theme="violet"] .topbar{background:rgba(13,11,26,0.85);}
+    [data-theme="foret"] .topbar{background:rgba(7,21,16,0.85);}
+    [data-theme="rouge"] .topbar{background:rgba(21,8,8,0.85);}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+    .search-wrap{position:relative;flex:0 0 320px;}
+    .search-input{width:100%;padding:0.5rem 1rem 0.5rem 2.4rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.83rem;transition:border-color 0.2s,box-shadow 0.2s;}
+    .search-input::placeholder{color:var(--text3);}
+    .search-input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+    .search-icon{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:0.9rem;pointer-events:none;}
+    .search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 16px 40px var(--shadow);display:none;z-index:200;max-height:320px;overflow-y:auto;}
+    .search-results.show{display:block;}
+    .search-result-item{padding:0.75rem 1rem;cursor:pointer;display:flex;align-items:center;gap:0.75rem;border-bottom:1px solid var(--border);transition:background 0.15s;}
+    .search-result-item:last-child{border-bottom:none;}
+    .search-result-item:hover{background:var(--surface);}
+    .search-avatar{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:0.8rem;font-weight:700;color:var(--bg);flex-shrink:0;}
+    .search-name{font-size:0.83rem;font-weight:600;}
+    .search-meta{font-size:0.72rem;color:var(--text2);font-family:'JetBrains Mono',monospace;}
+    .search-empty{padding:1.2rem;text-align:center;color:var(--text3);font-size:0.82rem;}
+    .api-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite;flex-shrink:0;}
+    .api-dot.off{background:var(--red);box-shadow:0 0 6px var(--red);animation:none;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+    .api-label{font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+
+    /* CONTENT */
+    .content{margin-left:240px;padding-top:60px;min-height:100vh;position:relative;z-index:1;}
+    .page{padding:1.8rem 2rem;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+
+    /* KPI */
+    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+    .kpi-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.4rem;position:relative;overflow:hidden;transition:transform 0.2s,border-color 0.2s,background 0.4s;cursor:default;}
+    .kpi-card:hover{transform:translateY(-3px);border-color:var(--border2);}
+    .kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+    .kpi-card.blue::after{background:linear-gradient(90deg,var(--accent),var(--accent2));}
+    .kpi-card.green::after{background:linear-gradient(90deg,var(--green),#10b981);}
+    .kpi-card.red::after{background:linear-gradient(90deg,var(--red),#f43f5e);}
+    .kpi-card.yellow::after{background:linear-gradient(90deg,var(--yellow),#f59e0b);}
+    .kpi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.7rem;}
+    .kpi-icon{font-size:1.3rem;opacity:0.8;}
+    .kpi-trend{font-size:0.68rem;padding:0.15rem 0.5rem;border-radius:99px;font-weight:600;font-family:'JetBrains Mono',monospace;}
+    .kpi-trend.up{background:rgba(52,211,153,0.15);color:var(--green);}
+    .kpi-trend.down{background:rgba(248,113,113,0.15);color:var(--red);}
+    .kpi-label{font-size:0.68rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text2);margin-bottom:0.35rem;}
+    .kpi-value{font-size:2rem;font-weight:800;letter-spacing:-0.04em;line-height:1;}
+    .kpi-value.c-blue{color:var(--accent);}
+    .kpi-value.c-green{color:var(--green);}
+    .kpi-value.c-red{color:var(--red);}
+    .kpi-value.c-yellow{color:var(--yellow);}
+    .kpi-sub{font-size:0.7rem;color:var(--text3);margin-top:0.35rem;font-family:'JetBrains Mono',monospace;}
+
+    /* SECTION HDR */
+    .section-hdr{display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;}
+    .section-hdr-line{flex:1;height:1px;background:var(--border);}
+    .section-hdr-label{font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);white-space:nowrap;}
+
+    /* STAT BOXES */
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem;margin-bottom:1rem;}
+    .stat-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;}
+    .stat-box-val{font-size:1.4rem;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent);}
+    .stat-box-lbl{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-top:0.2rem;}
+
+    /* INSIGHTS */
+    .insight-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;}
+    .insight-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem 1.2rem;display:flex;align-items:flex-start;gap:0.8rem;}
+    .insight-icon{font-size:1.4rem;flex-shrink:0;margin-top:0.1rem;}
+    .insight-title{font-size:0.78rem;font-weight:700;margin-bottom:0.2rem;}
+    .insight-text{font-size:0.72rem;color:var(--text2);line-height:1.5;}
+
+    /* CHARTS */
+    .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+    .chart-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.4rem;transition:background 0.4s,border-color 0.4s;}
+    .chart-card.wide{grid-column:1/-1;}
+    .chart-title{font-size:0.87rem;font-weight:700;margin-bottom:0.2rem;}
+    .chart-sub{font-size:0.68rem;color:var(--text3);margin-bottom:1rem;font-family:'JetBrains Mono',monospace;}
+    canvas{max-height:260px;}
+    .pie-wrap{display:flex;align-items:center;gap:2rem;}
+    .pie-wrap canvas{max-height:200px;max-width:200px;flex-shrink:0;}
+    .pie-legend{flex:1;}
+    .legend-row{display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;}
+    .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    .legend-lbl{font-size:0.75rem;color:var(--text2);}
+    .legend-val{font-size:1.1rem;font-weight:700;}
+
+    /* TABLE */
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1rem;}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .data-table th{padding:0.7rem 1rem;text-align:left;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface);}
+    .data-table td{padding:0.75rem 1rem;border-bottom:1px solid rgba(31,45,74,0.4);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--glow);}
+    .badge{display:inline-block;padding:0.2rem 0.55rem;border-radius:6px;font-size:0.65rem;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:0.05em;}
+    .badge-success{background:rgba(52,211,153,0.15);color:var(--green);}
+    .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
+    .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
+    .badge-info{background:rgba(56,189,248,0.15);color:var(--accent);}
+
+    /* MODAL */
+    .overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+    .overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px var(--shadow);animation:slide-up 0.25s ease;}
+    @keyframes slide-up{from{transform:translateY(24px);opacity:0}}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .modal-title{font-size:1.05rem;font-weight:700;}
+    .modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:1rem;display:grid;place-items:center;}
+    .modal-close:hover{background:var(--surface);}
+    .modal-section{margin-bottom:1.2rem;}
+    .modal-section-title{font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.6rem;padding-bottom:0.4rem;border-bottom:1px solid var(--border);}
+    .modal-row{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;font-size:0.82rem;}
+    .modal-row-lbl{color:var(--text2);}
+    .modal-row-val{font-weight:600;font-family:'JetBrains Mono',monospace;}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.8rem 1.3rem;border-radius:12px;font-size:0.83rem;background:var(--card);border:1px solid var(--green);box-shadow:0 8px 32px var(--shadow);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+    #toast.show{transform:translateY(0);opacity:1;}
+    #toast.err{border-color:var(--red);}
+
+    @media(max-width:1024px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.charts-grid{grid-template-columns:1fr;}.stat-grid{grid-template-columns:repeat(2,1fr);}.insight-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:768px){.sidebar{width:0;overflow:hidden;}.content{margin-left:0;}.topbar{left:0;}.search-wrap{flex:1;}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🎓</div>
+    <div class="logo-name">Uni<span>Analytics</span></div>
+  </div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item active" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom">
+    <div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v3.0.0 · PARAEU</div>
+  </div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title">Tableau de <span>bord</span></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="quick-search" placeholder="Nom, prénom ou matricule…" autocomplete="off" oninput="rechercheRapide(this.value)">
+    <div class="search-results" id="search-results"></div>
+  </div>
+  <div class="api-dot" id="api-dot"></div>
+  <div class="api-label" id="api-label">DEMO</div>
+</header>
+
+<main class="content">
+<div class="page">
+  <div class="page-header">
+    <h1>Vue d'ensemble</h1>
+    <p id="date-affichage">Analyse statistique complète — données en temps réel</p>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card blue">
+      <div class="kpi-top"><span class="kpi-icon">👥</span><span class="kpi-trend up" id="kpi-trend-inscrits">→</span></div>
+      <div class="kpi-label">Étudiants inscrits</div>
+      <div class="kpi-value c-blue" id="kpi-inscrits">—</div>
+      <div class="kpi-sub" id="kpi-sub-inscrits">chargement…</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-top"><span class="kpi-icon">📊</span><span class="kpi-trend up">📈</span></div>
+      <div class="kpi-label">Moyenne générale</div>
+      <div class="kpi-value c-green" id="kpi-moyenne">—</div>
+      <div class="kpi-sub">sur 20 pts</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-top"><span class="kpi-icon">✅</span><span class="kpi-trend up">📈</span></div>
+      <div class="kpi-label">Taux de réussite</div>
+      <div class="kpi-value c-yellow" id="kpi-reussite">—</div>
+      <div class="kpi-sub">Notes ≥ 10/20</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-top"><span class="kpi-icon">⚠️</span><span class="kpi-trend down">⚠️</span></div>
+      <div class="kpi-label">Risque d'abandon</div>
+      <div class="kpi-value c-red" id="kpi-risque">—</div>
+      <div class="kpi-sub" id="kpi-sub-risque">moyenne &lt; 10/20</div>
+    </div>
+  </div>
+
+  <div class="section-hdr"><span class="section-hdr-label">Analyse statistique</span><div class="section-hdr-line"></div></div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-box-val" id="stat-min">—</div><div class="stat-box-lbl">Note minimale</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="stat-max">—</div><div class="stat-box-lbl">Note maximale</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="stat-ecart">—</div><div class="stat-box-lbl">Écart-type</div></div>
+    <div class="stat-box"><div class="stat-box-val" id="stat-resultats">—</div><div class="stat-box-lbl">Résultats enregistrés</div></div>
+  </div>
+
+  <div class="insight-grid">
+    <div class="insight-card"><span class="insight-icon">📉</span><div><div class="insight-title">Dispersion des notes</div><div class="insight-text" id="insight-dispersion">Chargement…</div></div></div>
+    <div class="insight-card"><span class="insight-icon">🎯</span><div><div class="insight-title">Performance globale</div><div class="insight-text" id="insight-perf">Chargement…</div></div></div>
+    <div class="insight-card"><span class="insight-icon">🚨</span><div><div class="insight-title">Alerte abandon</div><div class="insight-text" id="insight-abandon">Chargement…</div></div></div>
+  </div>
+
+  <div class="section-hdr"><span class="section-hdr-label">Visualisations</span><div class="section-hdr-line"></div></div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Distribution des notes</div>
+      <div class="chart-sub">Répartition par tranche · toutes filières</div>
+      <canvas id="chart-hist"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Réussite / Risque d'abandon</div>
+      <div class="chart-sub">Étudiants avec moyenne &lt; 10/20</div>
+      <div class="pie-wrap">
+        <canvas id="chart-pie"></canvas>
+        <div class="pie-legend">
+          <div class="legend-row"><div class="legend-dot" style="background:var(--green)"></div><div><div class="legend-lbl">En réussite</div><div class="legend-val" style="color:var(--green)" id="leg-ok">—</div></div></div>
+          <div class="legend-row"><div class="legend-dot" style="background:var(--red)"></div><div><div class="legend-lbl">À risque</div><div class="legend-val" style="color:var(--red)" id="leg-risk">—</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-title">Corrélation Heures d'étude ↔ Note finale</div>
+      <div class="chart-sub">Un point = un étudiant · droite de régression linéaire</div>
+      <canvas id="chart-scatter" style="max-height:280px"></canvas>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-title">Performance par filière</div>
+      <div class="chart-sub">Moyenne générale /20 · comparaison inter-filières</div>
+      <canvas id="chart-filieres" style="max-height:240px"></canvas>
+    </div>
+  </div>
+
+  <div class="section-hdr">
+    <span class="section-hdr-label">Étudiants à risque d'abandon (Échec)</span>
+    <div class="section-hdr-line"></div>
+    <a href="recherche.html" style="font-size:0.72rem;color:var(--accent);text-decoration:none;white-space:nowrap;">Voir tout →</a>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr><th>Étudiant</th><th>Matricule</th><th>Filière</th><th>Présence moy.</th><th>Moy. notes</th><th>Statut</th></tr></thead>
+      <tbody id="risk-body"><tr><td colspan="6" style="text-align:center;color:var(--text3);padding:1.5rem">Chargement…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<div class="overlay" id="student-overlay" onclick="if(event.target===this)closeStudentModal()">
+  <div class="modal">
+    <div class="modal-hdr"><div class="modal-title" id="modal-title">Fiche étudiant</div><button class="modal-close" onclick="closeStudentModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script src="api.js"></script>
+<script>
+let _CH = {}; // registre Chart.js
+
+const DEMO = {
+  resume:{nb_etudiants:0,moyenne_generale:0,taux_reussite:0,taux_risque_abandon:0,nb_resultats:0,note_min:0,note_max:0,ecart_type:0},
+  distribution:{labels:["0-5","5-10","10-12","12-14","14-16","16-18","18-20"],values:[0,0,0,0,0,0,0]},
+  risque:{pct_risque:0,pct_ok:100,nb_a_risque:0,a_risque:[]},
+  filieres:{filieres:[]},
+  correlation:{points:[]}
+};
+
+async function loadAllData() {
+  const online = await checkAPI();
+  let resume=null, dist=null, risqueRaw=null, corr=null, fil=null;
+
+  if (online) {
+    try {
+      [resume, dist, risqueRaw, corr, fil] = await Promise.all([
+        apiGet('/analytics/resume'),
+        apiGet('/analytics/distribution-notes'),
+        apiGet('/analytics/risque-abandon'),
+        apiGet('/analytics/correlation-etude-note'),
+        apiGet('/analytics/performance-par-filiere'),
+      ]);
+    } catch(e) { console.warn('API error:', e); }
+  }
+
+  if (!resume) resume = DEMO.resume;
+  if (!dist)   dist   = DEMO.distribution;
+  if (!corr)   corr   = DEMO.correlation;
+  if (!fil)    fil    = DEMO.filieres;
+
+  const risque = {
+    pct_risque: resume.taux_risque_abandon || 0,
+    pct_ok:     Math.round((100 - (resume.taux_risque_abandon||0)) * 10) / 10,
+    nb_a_risque: risqueRaw ? (risqueRaw.nb_a_risque || 0) : 0,
+    details: risqueRaw ? (risqueRaw.a_risque || []) : []
+  };
+
+  // ─── KPI ───────────────────────────────────────────────────────────
+  document.getElementById('kpi-inscrits').textContent  = resume.nb_etudiants ?? 0;
+  document.getElementById('kpi-sub-inscrits').textContent = resume.nb_etudiants===0
+    ? 'Aucun étudiant inscrit' : `${resume.nb_etudiants} inscrits au total`;
+  document.getElementById('kpi-moyenne').textContent   = resume.moyenne_generale!=null ? resume.moyenne_generale.toFixed(1) : '—';
+  document.getElementById('kpi-reussite').textContent  = resume.taux_reussite!=null ? resume.taux_reussite.toFixed(1)+'%' : '—';
+  document.getElementById('kpi-risque').textContent    = risque.pct_risque.toFixed(1)+'%';
+  document.getElementById('kpi-sub-risque').textContent= `≈ ${risque.nb_a_risque} étudiant(s)`;
+
+  // ─── STATS ─────────────────────────────────────────────────────────
+  document.getElementById('stat-min').textContent      = resume.note_min!=null ? resume.note_min.toFixed(1) : '—';
+  document.getElementById('stat-max').textContent      = resume.note_max!=null ? resume.note_max.toFixed(1) : '—';
+  document.getElementById('stat-ecart').textContent    = resume.ecart_type!=null ? resume.ecart_type.toFixed(2) : '—';
+  document.getElementById('stat-resultats').textContent= resume.nb_resultats ?? 0;
+
+  // ─── LÉGENDE CAMEMBERT ─────────────────────────────────────────────
+  document.getElementById('leg-ok').textContent   = risque.pct_ok.toFixed(1)+'%';
+  document.getElementById('leg-risk').textContent = risque.pct_risque.toFixed(1)+'%';
+
+  // ─── INSIGHTS ──────────────────────────────────────────────────────
+  document.getElementById('insight-dispersion').textContent =
+    resume.nb_resultats > 0
+      ? `Écart-type ${resume.ecart_type?.toFixed(2)} · notes entre ${resume.note_min?.toFixed(1)} et ${resume.note_max?.toFixed(1)}/20.`
+      : 'Aucun résultat enregistré. Entrez des notes via Collecte données.';
+  document.getElementById('insight-perf').textContent =
+    resume.nb_resultats > 0
+      ? (resume.taux_reussite >= 70
+          ? `${resume.taux_reussite}% de réussite — performance satisfaisante (≥ 70%).`
+          : `${resume.taux_reussite}% de réussite — en dessous du seuil de 70%.`)
+      : 'Saisissez des résultats pour voir le taux de réussite.';
+  document.getElementById('insight-abandon').textContent =
+    risque.nb_a_risque > 0
+      ? `${risque.nb_a_risque} étudiant(s) (${risque.pct_risque}%) avec une moyenne < 10. Intervention recommandée.`
+      : 'Aucun étudiant à risque détecté.';
+
+  // ─── DATE ──────────────────────────────────────────────────────────
+  try {
+    const info = await apiGet('/info');
+    document.getElementById('date-affichage').textContent =
+      `Analyse statistique · ${info.date} à ${info.heure}`;
+  } catch {}
+
+  // ─── GRAPHIQUES ────────────────────────────────────────────────────
+  const c = getChartColors();
+  const scaleOpts = {
+    x:{grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:11}}},
+    y:{grid:{color:c.border},ticks:{color:c.text2,font:{family:'Outfit',size:11}}}
+  };
+
+  // 1. Histogramme distribution
+  if (_CH.hist) _CH.hist.destroy();
+  _CH.hist = new Chart(document.getElementById('chart-hist'), {
+    type:'bar',
+    data:{labels:dist.labels,datasets:[{data:dist.values,
+      backgroundColor:dist.values.map((_,i)=>i===3?c.accent:`${c.accent}66`),
+      borderRadius:6,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a2035',callbacks:{label:ctx=>`${ctx.raw} étudiants`}}},
+      scales:scaleOpts}
+  });
+
+  // 2. Camembert réussite/risque
+  if (_CH.pie) _CH.pie.destroy();
+  _CH.pie = new Chart(document.getElementById('chart-pie'), {
+    type:'doughnut',
+    data:{labels:['En réussite','À risque'],datasets:[{
+      data:[Math.max(0,risque.pct_ok), Math.max(0,risque.pct_risque)],
+      backgroundColor:[c.green,c.red],borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'72%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.raw}%`}}}}
+  });
+
+  // 3. Scatter corrélation avec régression
+  if (_CH.scatter) _CH.scatter.destroy();
+  const pts = corr.points || [];
+  let regLine = [];
+  if (pts.length >= 2) {
+    const xs = pts.map(p=>p.heures_etude), ys = pts.map(p=>p.note);
+    const mx=xs.reduce((a,b)=>a+b,0)/xs.length, my=ys.reduce((a,b)=>a+b,0)/ys.length;
+    const denom=xs.reduce((s,x)=>s+(x-mx)**2,0);
+    const a=denom?xs.reduce((s,x,i)=>s+(x-mx)*(ys[i]-my),0)/denom:0, b=my-a*mx;
+    const xMin=Math.min(...xs), xMax=Math.max(...xs);
+    regLine=[{x:xMin,y:a*xMin+b},{x:xMax,y:a*xMax+b}];
+  }
+  _CH.scatter = new Chart(document.getElementById('chart-scatter'), {
+    type:'scatter',
+    data:{datasets:[
+      {label:'Étudiants',data:pts.map(p=>({x:p.heures_etude,y:p.note})),
+       backgroundColor:`${c.accent}99`,pointRadius:5,pointHoverRadius:8},
+      {label:'Régression',type:'line',data:regLine,
+       borderColor:c.red,borderWidth:2,pointRadius:0,fill:false,tension:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:true,labels:{color:c.text2,font:{family:'Outfit'}}},
+        tooltip:{backgroundColor:'#1a2035',callbacks:{label:ctx=>`${ctx.raw.x}h → ${ctx.raw.y}/20`}}},
+      scales:{
+        x:{...scaleOpts.x,title:{display:true,text:"Heures d'étude / jour",color:c.text2}},
+        y:{...scaleOpts.y,min:0,max:20,title:{display:true,text:'Note /20',color:c.text2}}
+      }}
+  });
+
+  // 4. Barres filières
+  if (_CH.fil) _CH.fil.destroy();
+  const filieres = fil.filieres || [];
+  _CH.fil = new Chart(document.getElementById('chart-filieres'), {
+    type:'bar',
+    data:{labels:filieres.map(f=>f.filiere),datasets:[
+      {label:'Moyenne /20',data:filieres.map(f=>f.moyenne),backgroundColor:`${c.accent}99`,borderRadius:6,borderSkipped:false},
+      {label:'Réussite %÷5',data:filieres.map(f=>f.taux_reussite/5),backgroundColor:`${c.accent2}99`,borderRadius:6,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{display:true,labels:{color:c.text2,font:{family:'Outfit'}}},
+        tooltip:{backgroundColor:'#1a2035'}},
+      scales:{...scaleOpts,y:{...scaleOpts.y,min:0,max:20}}}
+  });
+
+  // ─── TABLEAU RISQUES ───────────────────────────────────────────────
+  const tbody = document.getElementById('risk-body');
+  if (risque.details.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--green);padding:1.5rem">✅ Aucun étudiant à risque détecté</td></tr>`;
+  } else {
+    tbody.innerHTML = risque.details.map(s=>`<tr>
+      <td><strong>${s.nom}</strong></td>
+      <td><span class="badge badge-info">${s.matricule||'—'}</span></td>
+      <td>${s.filiere}</td>
+      <td>${s.moy_presence?.toFixed(1)||s.presence}%</td>
+      <td><span style="color:var(--red);font-weight:700">${s.moy_note?.toFixed(2)||s.note||'—'}/20</span></td>
+      <td><span class="badge badge-danger">⚠ À risque</span></td>
+    </tr>`).join('');
+  }
+}
+
+// ─── RECHERCHE RAPIDE ──────────────────────────────────────────────
+async function rechercheRapide(q) {
+  const box = document.getElementById('search-results');
+  if (!q || q.length < 2) { box.classList.remove('show'); return; }
+  try {
+    const etudiants = await apiGet('/etudiants');
+    const res = etudiants.filter(e =>
+      `${e.nom} ${e.prenom}`.toLowerCase().includes(q.toLowerCase()) ||
+      (e.matricule||'').toLowerCase().includes(q.toLowerCase())
+    ).slice(0, 6);
+    box.innerHTML = res.length
+      ? res.map(e=>`<div class="search-result-item" onclick="ouvrirFicheEtudiant(${e.id_etudiant})">
+          <div class="search-avatar">${e.nom[0]}${e.prenom[0]}</div>
+          <div><div class="search-name">${e.prenom} ${e.nom}</div>
+          <div class="search-meta">${e.matricule} · ${e.filiere} · ${e.niveau}</div></div>
+        </div>`).join('')
+      : `<div class="search-empty">Aucun résultat pour "${q}"</div>`;
+    box.classList.add('show');
+  } catch { box.innerHTML=`<div class="search-empty">⚠️ Serveur hors ligne</div>`; box.classList.add('show'); }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.search-wrap'))
+    document.getElementById('search-results').classList.remove('show');
+});
+
+// ─── MODAL FICHE ÉTUDIANT ──────────────────────────────────────────
+async function ouvrirFicheEtudiant(id) {
+  document.getElementById('search-results').classList.remove('show');
+  document.getElementById('quick-search').value = '';
+  try {
+    const [e, res] = await Promise.all([
+      apiGet(`/etudiants/${id}`),
+      apiGet(`/resultats/${id}`).catch(()=>[])
+    ]);
+    const moy = res.length ? (res.reduce((s,r)=>s+r.note_examen,0)/res.length).toFixed(2) : '—';
+    document.getElementById('modal-title').textContent = `${e.prenom} ${e.nom}`;
+    document.getElementById('modal-body').innerHTML = `
+      <div class="modal-section">
+        <div class="modal-section-title">Identité</div>
+        <div class="modal-row"><span class="modal-row-lbl">Matricule</span><span class="modal-row-val">${e.matricule}</span></div>
+        <div class="modal-row"><span class="modal-row-lbl">Sexe</span><span class="modal-row-val">${e.sexe||'M'}</span></div>
+        <div class="modal-row"><span class="modal-row-lbl">Filière</span><span class="modal-row-val">${e.filiere}</span></div>
+        <div class="modal-row"><span class="modal-row-lbl">Niveau</span><span class="modal-row-val">${e.niveau}</span></div>
+        <div class="modal-row"><span class="modal-row-lbl">Âge</span><span class="modal-row-val">${e.age} ans</span></div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Performance (${res.length} matière(s))</div>
+        <div class="modal-row"><span class="modal-row-lbl">Moyenne générale</span>
+          <span class="modal-row-val" style="color:${parseFloat(moy)>=10?'var(--green)':'var(--red)'};font-size:1.2rem">${moy}/20</span></div>
+        <div class="modal-row"><span class="modal-row-lbl">Statut</span>
+          <span class="badge ${parseFloat(moy)>=10?'badge-success':'badge-danger'}">${parseFloat(moy)>=10?'✅ En réussite':'⚠️ À risque'}</span></div>
+      </div>
+      ${res.length?`<div class="modal-section">
+        <div class="modal-section-title">Détail des notes</div>
+        ${res.map(r=>`<div class="modal-row">
+          <span class="modal-row-lbl">${r.nom_matiere} <span style="color:var(--text3);font-size:0.7rem">(${r.code_matiere})</span></span>
+          <span class="modal-row-val" style="color:${r.note_examen>=10?'var(--green)':'var(--red)'}">${r.note_examen}/20</span>
+        </div>`).join('')}
+      </div>`:''}`;
+    document.getElementById('student-overlay').classList.add('show');
+  } catch { toast('❌ Impossible de charger la fiche', true); }
+}
+
+function closeStudentModal() { document.getElementById('student-overlay').classList.remove('show'); }
+
+// ─── INIT ──────────────────────────────────────────────────────────
+loadAllData();
+
+// Rafraîchissement quand collecte.html envoie des données
+if (typeof _bc !== 'undefined' && _bc) {
+  _bc.onmessage = () => loadAllData();
+}
+</script>
+</body>
+</html>

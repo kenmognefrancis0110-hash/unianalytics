@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniAnalytics — Collecte de données</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    :root,[data-theme="dark"]{--bg:#080b12;--bg2:#0e1220;--surface:#131928;--card:#161d30;--border:#1f2d4a;--border2:#2a3d5e;--accent:#38bdf8;--accent2:#818cf8;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#e2e8f0;--text2:#94a3b8;--text3:#475569;--glow:rgba(56,189,248,0.12);--shadow:rgba(0,0,0,0.5);}
+    [data-theme="light"]{--bg:#f0f4f8;--bg2:#e8edf5;--surface:#ffffff;--card:#ffffff;--border:#d1dce8;--border2:#b8cade;--accent:#0284c7;--accent2:#6366f1;--green:#059669;--red:#dc2626;--yellow:#d97706;--text:#0f172a;--text2:#475569;--text3:#94a3b8;--glow:rgba(2,132,199,0.1);--shadow:rgba(0,0,0,0.1);}
+    [data-theme="ocean"]{--bg:#020c1b;--bg2:#0a192f;--surface:#112240;--card:#1a2f4a;--border:#1e3a5f;--border2:#2a4f7a;--accent:#64ffda;--accent2:#ccd6f6;--green:#64ffda;--red:#ff6b6b;--yellow:#ffd700;--text:#ccd6f6;--text2:#8892b0;--text3:#495670;--glow:rgba(100,255,218,0.1);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="violet"]{--bg:#0d0b1a;--bg2:#120f2a;--surface:#1a1535;--card:#1e1840;--border:#2d2560;--border2:#3d3280;--accent:#a78bfa;--accent2:#f472b6;--green:#34d399;--red:#fb7185;--yellow:#fbbf24;--text:#ede9fe;--text2:#a78bfa;--text3:#6d5aca;--glow:rgba(167,139,250,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="foret"]{--bg:#071510;--bg2:#0b1f14;--surface:#0f291a;--card:#123020;--border:#1a4228;--border2:#245635;--accent:#4ade80;--accent2:#86efac;--green:#4ade80;--red:#f87171;--yellow:#fde047;--text:#dcfce7;--text2:#86efac;--text3:#4a7c59;--glow:rgba(74,222,128,0.12);--shadow:rgba(0,0,0,0.6);}
+    [data-theme="rouge"]{--bg:#150808;--bg2:#200c0c;--surface:#2a1010;--card:#321212;--border:#4a1c1c;--border2:#6b2424;--accent:#f87171;--accent2:#fbbf24;--green:#34d399;--red:#f87171;--yellow:#fbbf24;--text:#fef2f2;--text2:#fca5a5;--text3:#7f3a3a;--glow:rgba(248,113,113,0.12);--shadow:rgba(0,0,0,0.6);}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden;transition:background 0.4s,color 0.4s;}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(56,189,248,0.06),transparent);pointer-events:none;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;z-index:100;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+    .sidebar-logo{padding:1.5rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.7rem;}
+    .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:grid;place-items:center;font-size:1rem;}
+    .logo-name{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;}
+    .logo-name span{color:var(--accent);}
+    .nav-section{padding:1rem 0.8rem 0.4rem;font-size:0.6rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text3);}
+    .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 1rem;margin:0 0.5rem 0.15rem;border-radius:10px;font-size:0.85rem;font-weight:500;color:var(--text2);transition:all 0.18s;text-decoration:none;width:calc(100% - 1rem);}
+    .nav-item:hover{background:var(--surface);color:var(--text);}
+    .nav-item.active{background:var(--glow);color:var(--accent);border:1px solid var(--border);}
+    .nav-icon{font-size:1rem;width:20px;text-align:center;}
+    .sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);padding:1rem 0.8rem;}
+    .topbar{position:fixed;top:0;left:240px;right:0;height:60px;z-index:90;background:rgba(8,11,18,0.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;}
+    .topbar-title{font-size:1rem;font-weight:600;flex:1;}
+    .topbar-title span{color:var(--accent);}
+    .api-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite;}
+    .api-dot.off{background:var(--red);animation:none;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+    .api-label{font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+    .content{margin-left:240px;padding:80px 2rem 2rem;min-height:100vh;position:relative;z-index:1;}
+    .page-header{margin-bottom:1.5rem;}
+    .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-0.02em;}
+    .page-header p{font-size:0.83rem;color:var(--text2);margin-top:0.2rem;}
+    .tabs{display:flex;gap:0.5rem;background:var(--surface);border-radius:14px;padding:0.35rem;margin-bottom:1.5rem;border:1px solid var(--border);}
+    .tab{flex:1;padding:0.65rem;border-radius:10px;text-align:center;font-size:0.83rem;font-weight:600;color:var(--text3);cursor:pointer;transition:all 0.2s;border:none;background:none;font-family:'Outfit',sans-serif;}
+    .tab:hover{color:var(--text2);}
+    .tab.active{background:var(--card);color:var(--accent);box-shadow:0 2px 8px var(--shadow);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    .form-layout{display:grid;grid-template-columns:1fr; max-width:800px; margin:0 auto; gap:1.5rem;}
+    .form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;}
+    .form-card-title{font-size:1rem;font-weight:700;margin-bottom:0.3rem;}
+    .form-card-sub{font-size:0.75rem;color:var(--text2);margin-bottom:1.5rem;}
+    .form-group{margin-bottom:1rem;}
+    .form-label{display:block;font-size:0.7rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text2);margin-bottom:0.4rem;}
+    .form-input,.form-select{width:100%;padding:0.65rem 0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:0.87rem;transition:border-color 0.2s,box-shadow 0.2s;}
+    .form-input:focus,.form-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--glow);}
+    .form-input::placeholder{color:var(--text3);}
+    .form-select option{background:var(--card);}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;}
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.7rem 1.3rem;border-radius:10px;border:none;font-family:'Outfit',sans-serif;font-size:0.87rem;font-weight:600;cursor:pointer;transition:all 0.18s;}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--bg);}
+    .btn-primary:hover{opacity:0.88;transform:translateY(-1px);}
+    .btn-ghost{background:none;border:1px solid var(--border);color:var(--text2);}
+    .btn-ghost:hover{background:var(--surface);color:var(--text);}
+    .btn-full{width:100%;justify-content:center;margin-top:0.5rem;}
+    .result-box{background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.3);border-radius:12px;padding:1rem;margin-top:1rem;display:none;}
+    .result-box.show{display:block;}
+    .result-box-title{font-size:0.7rem;font-weight:700;color:var(--green);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.08em;}
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:1.5rem;}
+    .table-wrap-title{padding:0.8rem 1rem;font-size:0.75rem;font-weight:700;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+    .data-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .data-table th{padding:0.6rem 1rem;text-align:left;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);background:var(--surface);}
+    .data-table td{padding:0.65rem 1rem;border-bottom:1px solid rgba(31,45,74,0.4);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .data-table tr:hover td{background:var(--glow);}
+    .badge{display:inline-block;padding:0.2rem 0.5rem;border-radius:6px;font-size:0.62rem;font-weight:700;font-family:'JetBrains Mono',monospace;}
+    .badge-success{background:rgba(52,211,153,0.15);color:var(--green);}
+    .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
+    .badge-info{background:rgba(56,189,248,0.15);color:var(--accent);}
+    .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
+    
+    /* MODAL */
+    .overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
+    .overlay.show{display:flex;}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px var(--shadow);animation:slide-up 0.25s ease;}
+    @keyframes slide-up{from{transform:translateY(24px);opacity:0}}
+    .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+    .modal-title{font-size:1.05rem;font-weight:700;}
+
+    #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.8rem 1.3rem;border-radius:12px;font-size:0.83rem;background:var(--card);border:1px solid var(--green);box-shadow:0 8px 32px var(--shadow);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+    #toast.show{transform:translateY(0);opacity:1;}
+    #toast.err{border-color:var(--red);}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo"><div class="logo-mark">🎓</div><div class="logo-name">Uni<span>Analytics</span></div></div>
+  <div class="nav-section">Principal</div>
+  <a class="nav-item" href="index.html"><span class="nav-icon">📊</span> Tableau de bord</a>
+  <div class="nav-section">Modules</div>
+  <a class="nav-item" href="recherche.html"><span class="nav-icon">🔍</span> Recherche étudiant</a>
+  <a class="nav-item active" href="collecte.html"><span class="nav-icon">➕</span> Collecte données</a>
+  <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
+  <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
+  <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
+  <div class="sidebar-bottom"><div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v3.0.0 · PARAEU</div></div>
+</aside>
+
+<header class="topbar">
+  <div class="topbar-title">Collecte de <span>données</span></div>
+  <div class="api-dot" id="api-dot"></div>
+  <div class="api-label" id="api-label">DEMO</div>
+</header>
+
+<main class="content">
+  <div class="page-header">
+    <h1>Collecte de données</h1>
+    <p>Enregistrement des informations académiques — étudiants, sessions et résultats</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('etudiant',this)">👤 Nouvel étudiant</button>
+    <button class="tab" onclick="switchTab('session',this)">📖 Session d'étude</button>
+    <button class="tab" onclick="switchTab('resultat',this)">📝 Résultat examen</button>
+    <button class="tab" onclick="switchTab('ancien',this)">🎓 Ancien étudiant</button>
+    <button class="tab" onclick="switchTab('liste',this)">📋 Liste étudiants</button>
+  </div>
+
+  <div class="tab-content active" id="tab-etudiant">
+    <div class="form-layout">
+      <div class="form-card">
+        <div class="form-card-title">Enregistrer un nouvel étudiant</div>
+        <div class="form-card-sub">Le matricule au format XXYXXXX sera généré automatiquement.</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="e-nom" placeholder="Mbarga"></div>
+          <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="e-prenom" placeholder="Jean-Paul"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Sexe</label>
+            <select class="form-select" id="e-sexe">
+              <option value="M">Masculin</option>
+              <option value="F">Féminin</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Filière</label>
+            <select class="form-select" id="e-filiere">
+              <option>Informatique</option><option>Mathématiques</option>
+              <option>Physique</option><option>Économie</option><option>Droit</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Niveau d'étude</label>
+            <select class="form-select" id="e-niveau">
+              <option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Âge</label><input class="form-input" type="number" id="e-age" placeholder="21" min="17" max="60"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Année d'inscription</label><input class="form-input" type="number" id="e-annee" placeholder="2024"></div>
+        <button class="btn btn-primary btn-full" onclick="enregistrerEtudiant()">➕ Enregistrer l'étudiant</button>
+        <div class="result-box" id="result-etudiant">
+          <div class="result-box-title">✅ Étudiant créé avec succès</div>
+          <div id="result-etudiant-detail" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-session">
+    <div class="form-layout">
+      <div class="form-card">
+        <div class="form-card-title">Enregistrer une session d'étude</div>
+        <div class="form-card-sub">Saisissez les données d'une journée de travail individuelle</div>
+        <div class="form-group">
+          <label class="form-label">Étudiant</label>
+          <select class="form-select" id="s-etudiant">
+            <option value="">— Sélectionner un étudiant —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="s-date"></div>
+          <div class="form-group"><label class="form-label">Heures d'étude</label><input class="form-input" type="number" id="s-heures" step="0.5" min="0" max="24" placeholder="4.5"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Heures de sommeil</label><input class="form-input" type="number" id="s-sommeil" step="0.5" min="0" max="24" placeholder="7"></div>
+          <div class="form-group">
+            <label class="form-label">Humeur (1–5)</label>
+            <select class="form-select" id="s-humeur">
+              <option value="1">1 — Très mauvais</option><option value="2">2 — Mauvais</option>
+              <option value="3" selected>3 — Neutre</option><option value="4">4 — Bien</option>
+              <option value="5">5 — Excellent</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="enregistrerSession()">💾 Enregistrer la session</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-resultat">
+    <div class="form-layout" style="max-width:900px;">
+      <div class="form-card">
+        <div class="form-card-title">Enregistrer des résultats (Min. 5 matières)</div>
+        <div class="form-card-sub">Saisissez la note sur 100 et le taux de présence pour chaque matière</div>
+        <div class="form-row" style="margin-bottom:1.5rem">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Étudiant</label>
+            <select class="form-select" id="r-etudiant">
+              <option value="">— Sélectionner un étudiant —</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Session</label>
+            <select class="form-select" id="r-session">
+              <option value="S1">Semestre 1</option><option value="S2">Semestre 2</option><option value="rattrapage">Rattrapage</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="matieres-container"></div>
+        
+        <button class="btn btn-ghost" style="margin-bottom:1.5rem" onclick="ajouterMatiere()">➕ Ajouter une matière</button>
+        <button class="btn btn-primary btn-full" onclick="enregistrerResultat()">💾 Enregistrer les résultats</button>
+        <div class="result-box" id="result-resultat">
+          <div class="result-box-title">✅ Résultats enregistrés</div>
+          <div id="result-resultat-detail" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-ancien">
+    <div class="form-layout">
+      <div class="form-card">
+        <div class="form-card-title">Enregistrer un départ</div>
+        <div class="form-card-sub">Archiver un étudiant qui quitte l'université</div>
+        <div class="form-group">
+          <label class="form-label">Étudiant</label>
+          <select class="form-select" id="a-etudiant">
+            <option value="">— Sélectionner un étudiant —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cause du départ</label>
+          <select class="form-select" id="a-cause">
+            <option value="fin_parcours">🎓 Fin de parcours (diplômé)</option>
+            <option value="abandon">🚪 Abandon volontaire</option>
+            <option value="echec_scolaire">❌ Échec scolaire</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Année de départ</label><input class="form-input" type="number" id="a-annee" placeholder="2024"></div>
+        <div class="form-group"><label class="form-label">Commentaire (optionnel)</label><input class="form-input" id="a-note" placeholder="Précisions sur le départ…"></div>
+        <button class="btn btn-primary btn-full" onclick="enregistrerAncien()">💾 Enregistrer le départ</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-liste">
+    <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+      <select class="form-select" id="filtre-filiere" style="width:200px" onchange="chargerListe()">
+        <option value="">Toutes les filières</option>
+        <option value="Informatique">Informatique</option>
+        <option value="Mathématiques">Mathématiques</option>
+        <option value="Physique">Physique</option>
+        <option value="Économie">Économie</option>
+        <option value="Droit">Droit</option>
+      </select>
+      <select class="form-select" id="filtre-niveau" style="width:150px" onchange="chargerListe()">
+        <option value="">Tous les niveaux</option>
+        <option value="L1">L1</option><option value="L2">L2</option>
+        <option value="L3">L3</option><option value="M1">M1</option><option value="M2">M2</option>
+      </select>
+      <button class="btn btn-ghost" onclick="chargerListe()">🔄 Actualiser</button>
+      <span id="liste-count" style="font-size:0.82rem;color:var(--text2);margin-left:0.5rem"></span>
+      
+      <button class="btn btn-primary" style="margin-left:auto;background:var(--green);border-color:var(--green)" onclick="archiverM2()">🎓 Clôturer les M2</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-wrap-title">
+        <span>📋 Liste des étudiants inscrits</span>
+        <span id="nb-inscrits" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent)">—</span>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Filière</th><th>Niveau</th><th>Moyenne</th><th>Actions</th></tr></thead>
+        <tbody id="liste-body"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Cliquez sur Actualiser</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="overlay" id="edit-overlay" onclick="if(event.target===this) document.getElementById('edit-overlay').classList.remove('show')">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Modifier la fiche étudiante</div>
+      <button class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('show')">✕</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="edit-nom"></div>
+      <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="edit-prenom"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Sexe</label>
+        <select class="form-select" id="edit-sexe"><option value="M">Masculin</option><option value="F">Féminin</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Filière</label>
+        <select class="form-select" id="edit-filiere">
+          <option>Informatique</option><option>Mathématiques</option><option>Physique</option><option>Économie</option><option>Droit</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Niveau</label><select class="form-select" id="edit-niveau"><option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option></select></div>
+      <div class="form-group"><label class="form-label">Âge</label><input class="form-input" type="number" id="edit-age"></div>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="sauvegarderModification()">💾 Enregistrer les modifications</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="api.js"></script>
+<script>
+// ─── TAB ──────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if (name==='session'||name==='resultat'||name==='ancien') chargerSelectEtudiants();
+  if (name==='liste') chargerListe();
+}
+
+// ─── CHARGER ÉTUDIANTS DANS LES SELECTS ──────────────────────────
+async function chargerSelectEtudiants() {
+  try {
+    const etudiants = await apiGet('/etudiants');
+    const opts = etudiants.map(e=>
+      `<option value="${e.id_etudiant}">${e.prenom} ${e.nom} (${e.matricule}) — ${e.filiere} ${e.niveau}</option>`
+    ).join('');
+    const placeholder = '<option value="">— Sélectionner un étudiant —</option>';
+    ['s-etudiant','r-etudiant','a-etudiant'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.innerHTML = placeholder + opts;
+    });
+  } catch(e) {}
+}
+
+// ─── ENREGISTREMENT ÉTUDIANT ──────────────────────────────────────
+async function enregistrerEtudiant() {
+  const nom=document.getElementById('e-nom').value.trim();
+  const prenom=document.getElementById('e-prenom').value.trim();
+  const sexe=document.getElementById('e-sexe').value;
+  const filiere=document.getElementById('e-filiere').value;
+  const niveau=document.getElementById('e-niveau').value;
+  const age=parseInt(document.getElementById('e-age').value);
+  const annee=parseInt(document.getElementById('e-annee').value)||null;
+  if(!nom||!prenom||!age||age<17||age>60){toast('⚠️ Nom, prénom et âge (17–60) requis',true);return;}
+  try {
+    const res = await apiPost('/etudiants',{nom,prenom,sexe,filiere,niveau,age,annee_inscription:annee});
+    toast(`✅ ${prenom} ${nom} inscrit — ${res.matricule}`);
+    const rb = document.getElementById('result-etudiant');
+    document.getElementById('result-etudiant-detail').innerHTML = `Matricule généré : <b>${res.matricule}</b>`;
+    rb.classList.add('show');
+    ['e-nom','e-prenom','e-age','e-annee'].forEach(i=>document.getElementById(i).value='');
+    broadcastRefresh('etudiant');
+    chargerSelectEtudiants();
+  } catch(e){toast('❌ Erreur : '+e.message,true);}
+}
+
+// ─── ENREGISTREMENT SESSION ───────────────────────────────────────
+async function enregistrerSession() {
+  const id_etudiant=parseInt(document.getElementById('s-etudiant').value);
+  const date=document.getElementById('s-date').value;
+  const heures_etude=parseFloat(document.getElementById('s-heures').value);
+  const heures_sommeil=parseFloat(document.getElementById('s-sommeil').value)||7;
+  const humeur_index=parseInt(document.getElementById('s-humeur').value);
+  if(!id_etudiant||!date||isNaN(heures_etude)){toast('⚠️ Étudiant, date et heures requis',true);return;}
+  try {
+    await apiPost('/sessions',{id_etudiant,date,heures_etude,heures_sommeil,humeur_index});
+    toast(`✅ Session ${heures_etude}h enregistrée`);
+    ['s-heures','s-sommeil'].forEach(i=>document.getElementById(i).value='');
+    broadcastRefresh('session');
+  } catch(e){toast('❌ Erreur : '+e.message,true);}
+}
+
+// ─── MULTI-MATIÈRES RÉSULTATS ─────────────────────────────────────
+function ajouterMatiere() {
+  const container = document.getElementById('matieres-container');
+  const div = document.createElement('div');
+  div.className = 'matiere-row';
+  div.style.cssText = 'display:grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;';
+  div.innerHTML = `
+    <input class="form-input r-code" placeholder="Code (ex: INF101)">
+    <input class="form-input r-nom" placeholder="Nom matière">
+    <input class="form-input r-note" type="number" step="1" min="0" max="100" placeholder="Note /100">
+    <input class="form-input r-presence" type="number" min="0" max="100" placeholder="Prés. %" value="100" readonly style="background:var(--bg2); cursor:not-allowed;">
+  `;
+  container.appendChild(div);
+}
+
+async function enregistrerResultat() {
+  const id_etudiant = parseInt(document.getElementById('r-etudiant').value);
+  const session = document.getElementById('r-session').value;
+  
+  if(!id_etudiant){
+    toast('⚠️ Veuillez sélectionner un étudiant', true);
+    return;
+  }
+
+  const rows = document.querySelectorAll('.matiere-row');
+  let matieres = [];
+  
+  rows.forEach(r => {
+    const code = r.querySelector('.r-code').value.trim();
+    const nom = r.querySelector('.r-nom').value.trim();
+    const noteRaw = r.querySelector('.r-note').value;
+    const note = parseFloat(noteRaw);
+    const pres = parseFloat(r.querySelector('.r-presence').value) || 100;
+
+    if (code && !isNaN(note)) {
+      matieres.push({
+        code_matiere: code, 
+        nom_matiere: nom || code, 
+        note_examen: note, 
+        taux_presence: pres
+      });
+    }
+  });
+
+  if(matieres.length < 3) {
+    toast('⚠️ Erreur : Saisissez au moins 3 notes valides (0 à 100).', true);
+    return;
+  }
+
+  try {
+    await apiPost('/resultats/batch', {id_etudiant, session, matieres});
+    
+    toast(`✅ ${matieres.length} résultats enregistrés sur 100`);
+    
+    const rb = document.getElementById('result-resultat');
+    document.getElementById('result-resultat-detail').innerHTML = `<b>${matieres.length}</b> notes insérées avec succès pour l'étudiant #${id_etudiant}.`;
+    rb.classList.add('show');
+    
+    document.querySelectorAll('.r-note').forEach(input => input.value = '');
+    broadcastRefresh('resultat');
+    
+  } catch(e) {
+    console.error("Erreur API:", e);
+    toast('❌ Erreur Serveur : Vérifiez que le barème 100 est autorisé côté backend.', true);
+  }
+}
+
+// ─── ENREGISTREMENT ANCIEN ────────────────────────────────────────
+async function enregistrerAncien() {
+  const id_etudiant=parseInt(document.getElementById('a-etudiant').value);
+  const cause=document.getElementById('a-cause').value;
+  const annee_depart=parseInt(document.getElementById('a-annee').value)||null;
+  const commentaire=document.getElementById('a-note').value.trim();
+  if(!id_etudiant){toast('⚠️ Sélectionnez un étudiant',true);return;}
+  try {
+    await apiPost('/anciens',{id_etudiant,cause,annee_depart,commentaire});
+    toast(`✅ Départ enregistré`);
+    ['a-annee','a-note'].forEach(i=>document.getElementById(i).value='');
+    broadcastRefresh('ancien');
+  } catch(e){toast('❌ Erreur : '+e.message,true);}
+}
+
+// ─── LISTE ÉTUDIANTS (AVEC MODIF / SUPPR) ─────────────────────────
+let currentList = [];
+
+async function chargerListe() {
+  const filiere=document.getElementById('filtre-filiere').value;
+  const niveau=document.getElementById('filtre-niveau').value;
+  const tbody=document.getElementById('liste-body');
+  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:1.5rem">Chargement…</td></tr>`;
+  try {
+    let url='/etudiants';
+    if(filiere) url+=`?filiere=${encodeURIComponent(filiere)}`;
+    const etudiants=await apiGet(url);
+    const filtres=niveau?etudiants.filter(e=>e.niveau===niveau):etudiants;
+    
+    currentList = await Promise.all(filtres.map(async e=>{
+      const res=await apiGet(`/resultats/${e.id_etudiant}`).catch(()=>[]);
+      const moy=res.length?(res.reduce((s,r)=>s+r.note_examen,0)/res.length).toFixed(2):null;
+      return {...e,moy};
+    }));
+    
+    document.getElementById('liste-count').textContent=`${currentList.length} étudiant(s)`;
+    document.getElementById('nb-inscrits').textContent=currentList.length;
+    
+    if(!currentList.length){
+      tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Aucun étudiant trouvé</td></tr>`;
+      return;
+    }
+    
+    tbody.innerHTML=currentList.map(e=>{
+      const moy=e.moy;
+      // Mise à jour de la condition pour une notation sur 100 (succès si >= 50)
+      const statut=moy!=null?(parseFloat(moy)>=50?'badge-success':'badge-danger'):'badge-warn';
+      return `<tr>
+        <td><span class="badge badge-info">${e.matricule}</span></td>
+        <td><strong>${e.prenom} ${e.nom}</strong></td>
+        <td>${e.sexe||'M'}</td>
+        <td>${e.filiere}</td>
+        <td><span class="badge badge-warn">${e.niveau}</span></td>
+        <td><span class="badge ${statut}">${moy?moy+'/100':'Aucune note'}</span></td>
+        <td>
+          <button class="btn btn-ghost" style="padding:0.2rem 0.5rem" onclick="ouvrirEdit(${e.id_etudiant})">✏️</button>
+          <button class="btn btn-ghost" style="padding:0.2rem 0.5rem;color:var(--red)" onclick="supprimerEtudiant(${e.id_etudiant})">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--red);padding:2rem">⚠️ Erreur : ${e.message}</td></tr>`;
+  }
+}
+
+// ─── ACTIONS ──────────────────────────────────────────────────────
+function ouvrirEdit(id) {
+  const e = currentList.find(x=>x.id_etudiant===id);
+  if(!e) return;
+  document.getElementById('edit-id').value = e.id_etudiant;
+  document.getElementById('edit-nom').value = e.nom;
+  document.getElementById('edit-prenom').value = e.prenom;
+  document.getElementById('edit-sexe').value = e.sexe||'M';
+  document.getElementById('edit-filiere').value = e.filiere;
+  document.getElementById('edit-niveau').value = e.niveau;
+  document.getElementById('edit-age').value = e.age;
+  document.getElementById('edit-overlay').classList.add('show');
+}
+
+async function sauvegarderModification() {
+  const id = document.getElementById('edit-id').value;
+  const data = {
+    nom: document.getElementById('edit-nom').value,
+    prenom: document.getElementById('edit-prenom').value,
+    sexe: document.getElementById('edit-sexe').value,
+    filiere: document.getElementById('edit-filiere').value,
+    niveau: document.getElementById('edit-niveau').value,
+    age: parseInt(document.getElementById('edit-age').value)
+  };
+  try {
+    await apiPut(`/etudiants/${id}`, data);
+    toast('✅ Étudiant modifié avec succès');
+    document.getElementById('edit-overlay').classList.remove('show');
+    chargerListe();
+    broadcastRefresh('etudiant');
+  } catch(e){toast('❌ '+e.message,true);}
+}
+
+async function supprimerEtudiant(id) {
+  if(!confirm("Voulez-vous vraiment supprimer cet étudiant et TOUTES ses données académiques ?")) return;
+  try {
+    await apiDelete(`/etudiants/${id}`);
+    toast('✅ Étudiant supprimé');
+    chargerListe();
+    broadcastRefresh('etudiant');
+  } catch(e){toast('❌ Erreur de suppression',true);}
+}
+
+async function archiverM2() {
+  if(!confirm("Ceci clôturera le parcours des étudiants de M2. Ceux avec une moyenne > 50 seront validés, les autres signalés en échec. Confirmer ?")) return;
+  try {
+    const res = await apiPost('/etudiants/archiver-m2', {});
+    toast(`🎓 ${res.message}`);
+    chargerListe();
+    broadcastRefresh('etudiant');
+  } catch(e){toast('❌ '+e.message,true);}
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────
+document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+
+(async()=>{
+  for(let i=0; i<5; i++) ajouterMatiere();
+  await checkAPI();
+  if(API_OK) chargerSelectEtudiants();
+})();
+</script>
+</body>
+</html>
