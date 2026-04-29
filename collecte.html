@@ -43,7 +43,7 @@
     .tab.active{background:var(--card);color:var(--accent);box-shadow:0 2px 8px var(--shadow);}
     .tab-content{display:none;}
     .tab-content.active{display:block;}
-    .form-layout{display:grid;grid-template-columns:1fr; max-width:800px; margin:0 auto; gap:1.5rem;}
+    .form-layout{display:grid;grid-template-columns:1fr;max-width:800px;margin:0 auto;gap:1.5rem;}
     .form-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;}
     .form-card-title{font-size:1rem;font-weight:700;margin-bottom:0.3rem;}
     .form-card-sub{font-size:0.75rem;color:var(--text2);margin-bottom:1.5rem;}
@@ -75,14 +75,24 @@
     .badge-danger{background:rgba(248,113,113,0.15);color:var(--red);}
     .badge-info{background:rgba(56,189,248,0.15);color:var(--accent);}
     .badge-warn{background:rgba(251,191,36,0.15);color:var(--yellow);}
-    
-    /* MODAL */
+
+    /* Ligne matière : Code | Nom | Note /100 — SANS colonne présence */
+    .matiere-row{display:grid;grid-template-columns:140px 1fr 110px;gap:0.6rem;margin-bottom:0.5rem;align-items:center;}
+    .matiere-row .r-note{text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.95rem;font-weight:700;}
+
+    /* En-tête du tableau matières */
+    .matieres-header{display:grid;grid-template-columns:140px 1fr 110px;gap:0.6rem;margin-bottom:0.4rem;padding:0 0 0.4rem;border-bottom:1px solid var(--border);}
+    .matieres-header span{font-size:0.62rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);}
+    .matieres-header span:last-child{text-align:center;}
+
     .overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;}
     .overlay.show{display:flex;}
     .modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px var(--shadow);animation:slide-up 0.25s ease;}
     @keyframes slide-up{from{transform:translateY(24px);opacity:0}}
     .modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
     .modal-title{font-size:1.05rem;font-weight:700;}
+    .modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text2);cursor:pointer;font-size:1rem;display:grid;place-items:center;}
+    .modal-close:hover{background:var(--surface);}
 
     #toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;padding:0.8rem 1.3rem;border-radius:12px;font-size:0.83rem;background:var(--card);border:1px solid var(--green);box-shadow:0 8px 32px var(--shadow);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
     #toast.show{transform:translateY(0);opacity:1;}
@@ -101,7 +111,7 @@
   <a class="nav-item" href="performance.html"><span class="nav-icon">📈</span> Performance filières</a>
   <a class="nav-item" href="anciens.html"><span class="nav-icon">🗂️</span> Anciens étudiants</a>
   <a class="nav-item" href="parametres.html"><span class="nav-icon">⚙️</span> Paramètres</a>
-  <div class="sidebar-bottom"><div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v3.0.0 · PARAEU</div></div>
+  <div class="sidebar-bottom"><div style="font-size:0.7rem;color:var(--text3);font-family:'JetBrains Mono',monospace;">v4.1.0 · PARAEU</div></div>
 </aside>
 
 <header class="topbar">
@@ -124,11 +134,12 @@
     <button class="tab" onclick="switchTab('liste',this)">📋 Liste étudiants</button>
   </div>
 
+  <!-- ── TAB ÉTUDIANT ── -->
   <div class="tab-content active" id="tab-etudiant">
     <div class="form-layout">
       <div class="form-card">
-        <div class="form-card-title">Enregistrer un nouvel étudiant</div>
-        <div class="form-card-sub">Le matricule au format XXYXXXX sera généré automatiquement.</div>
+        <div class="form-card-title">👤 Enregistrer un nouvel étudiant</div>
+        <div class="form-card-sub">Le matricule sera généré automatiquement (format CM0001).</div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="e-nom" placeholder="Mbarga"></div>
           <div class="form-group"><label class="form-label">Prénom</label><input class="form-input" id="e-prenom" placeholder="Jean-Paul"></div>
@@ -156,9 +167,15 @@
               <option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option>
             </select>
           </div>
-          <div class="form-group"><label class="form-label">Âge</label><input class="form-input" type="number" id="e-age" placeholder="21" min="17" max="60"></div>
+          <div class="form-group">
+            <label class="form-label">Âge</label>
+            <input class="form-input" type="number" id="e-age" placeholder="21" min="17" max="60">
+          </div>
         </div>
-        <div class="form-group"><label class="form-label">Année d'inscription</label><input class="form-input" type="number" id="e-annee" placeholder="2024"></div>
+        <div class="form-group">
+          <label class="form-label">Année d'inscription</label>
+          <input class="form-input" type="number" id="e-annee" placeholder="2025">
+        </div>
         <button class="btn btn-primary btn-full" onclick="enregistrerEtudiant()">➕ Enregistrer l'étudiant</button>
         <div class="result-box" id="result-etudiant">
           <div class="result-box-title">✅ Étudiant créé avec succès</div>
@@ -168,16 +185,15 @@
     </div>
   </div>
 
+  <!-- ── TAB SESSION ── -->
   <div class="tab-content" id="tab-session">
     <div class="form-layout">
       <div class="form-card">
-        <div class="form-card-title">Enregistrer une session d'étude</div>
-        <div class="form-card-sub">Saisissez les données d'une journée de travail individuelle</div>
+        <div class="form-card-title">📖 Enregistrer une session d'étude</div>
+        <div class="form-card-sub">Données d'une journée de travail individuelle</div>
         <div class="form-group">
           <label class="form-label">Étudiant</label>
-          <select class="form-select" id="s-etudiant">
-            <option value="">— Sélectionner un étudiant —</option>
-          </select>
+          <select class="form-select" id="s-etudiant"><option value="">— Sélectionner un étudiant —</option></select>
         </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Date</label><input class="form-input" type="date" id="s-date"></div>
@@ -199,48 +215,61 @@
     </div>
   </div>
 
+  <!-- ── TAB RÉSULTAT ── -->
   <div class="tab-content" id="tab-resultat">
-    <div class="form-layout" style="max-width:900px;">
+    <div class="form-layout" style="max-width:860px;">
       <div class="form-card">
-        <div class="form-card-title">Enregistrer des résultats (Min. 5 matières)</div>
-        <div class="form-card-sub">Saisissez la note sur 100 et le taux de présence pour chaque matière</div>
+        <div class="form-card-title">📝 Enregistrer des résultats — Notes sur 100</div>
+        <div class="form-card-sub">Saisissez le code, le nom et la note (0 à 100) pour chaque matière. Minimum 5 matières requises.</div>
+
         <div class="form-row" style="margin-bottom:1.5rem">
           <div class="form-group" style="margin:0">
             <label class="form-label">Étudiant</label>
-            <select class="form-select" id="r-etudiant">
-              <option value="">— Sélectionner un étudiant —</option>
-            </select>
+            <select class="form-select" id="r-etudiant"><option value="">— Sélectionner un étudiant —</option></select>
           </div>
           <div class="form-group" style="margin:0">
             <label class="form-label">Session</label>
             <select class="form-select" id="r-session">
-              <option value="S1">Semestre 1</option><option value="S2">Semestre 2</option><option value="rattrapage">Rattrapage</option>
+              <option value="S1">Semestre 1</option>
+              <option value="S2">Semestre 2</option>
+              <option value="rattrapage">Rattrapage</option>
             </select>
           </div>
         </div>
 
+        <!-- En-tête colonnes : Code | Nom matière | Note /100 -->
+        <div class="matieres-header">
+          <span>Code matière</span>
+          <span>Nom de la matière</span>
+          <span style="text-align:center">Note /100</span>
+        </div>
+
         <div id="matieres-container"></div>
-        
-        <button class="btn btn-ghost" style="margin-bottom:1.5rem" onclick="ajouterMatiere()">➕ Ajouter une matière</button>
+
+        <div style="display:flex;gap:0.7rem;margin:1rem 0 1.5rem;">
+          <button class="btn btn-ghost" onclick="ajouterMatiere()">➕ Ajouter une matière</button>
+          <button class="btn btn-ghost" style="color:var(--red)" onclick="viderMatieres()">🗑️ Vider tout</button>
+        </div>
+
         <button class="btn btn-primary btn-full" onclick="enregistrerResultat()">💾 Enregistrer les résultats</button>
+
         <div class="result-box" id="result-resultat">
-          <div class="result-box-title">✅ Résultats enregistrés</div>
-          <div id="result-resultat-detail" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2)"></div>
+          <div class="result-box-title">✅ Résultats enregistrés avec succès</div>
+          <div id="result-resultat-detail" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--text2);line-height:1.8"></div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- ── TAB ANCIEN ── -->
   <div class="tab-content" id="tab-ancien">
     <div class="form-layout">
       <div class="form-card">
-        <div class="form-card-title">Enregistrer un départ</div>
+        <div class="form-card-title">🎓 Enregistrer un départ</div>
         <div class="form-card-sub">Archiver un étudiant qui quitte l'université</div>
         <div class="form-group">
           <label class="form-label">Étudiant</label>
-          <select class="form-select" id="a-etudiant">
-            <option value="">— Sélectionner un étudiant —</option>
-          </select>
+          <select class="form-select" id="a-etudiant"><option value="">— Sélectionner un étudiant —</option></select>
         </div>
         <div class="form-group">
           <label class="form-label">Cause du départ</label>
@@ -250,32 +279,34 @@
             <option value="echec_scolaire">❌ Échec scolaire</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Année de départ</label><input class="form-input" type="number" id="a-annee" placeholder="2024"></div>
-        <div class="form-group"><label class="form-label">Commentaire (optionnel)</label><input class="form-input" id="a-note" placeholder="Précisions sur le départ…"></div>
+        <div class="form-group">
+          <label class="form-label">Année de départ</label>
+          <input class="form-input" type="number" id="a-annee" placeholder="2025">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Commentaire (optionnel)</label>
+          <input class="form-input" id="a-note" placeholder="Précisions sur le départ…">
+        </div>
         <button class="btn btn-primary btn-full" onclick="enregistrerAncien()">💾 Enregistrer le départ</button>
       </div>
     </div>
   </div>
 
+  <!-- ── TAB LISTE ── -->
   <div class="tab-content" id="tab-liste">
     <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
       <select class="form-select" id="filtre-filiere" style="width:200px" onchange="chargerListe()">
         <option value="">Toutes les filières</option>
-        <option value="Informatique">Informatique</option>
-        <option value="Mathématiques">Mathématiques</option>
-        <option value="Physique">Physique</option>
-        <option value="Économie">Économie</option>
-        <option value="Droit">Droit</option>
+        <option>Informatique</option><option>Mathématiques</option>
+        <option>Physique</option><option>Économie</option><option>Droit</option>
       </select>
       <select class="form-select" id="filtre-niveau" style="width:150px" onchange="chargerListe()">
         <option value="">Tous les niveaux</option>
-        <option value="L1">L1</option><option value="L2">L2</option>
-        <option value="L3">L3</option><option value="M1">M1</option><option value="M2">M2</option>
+        <option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option>
       </select>
       <button class="btn btn-ghost" onclick="chargerListe()">🔄 Actualiser</button>
-      <span id="liste-count" style="font-size:0.82rem;color:var(--text2);margin-left:0.5rem"></span>
-      
-      <button class="btn btn-primary" style="margin-left:auto;background:var(--green);border-color:var(--green)" onclick="archiverM2()">🎓 Clôturer les M2</button>
+      <span id="liste-count" style="font-size:0.82rem;color:var(--text2)"></span>
+      <button class="btn btn-primary" style="margin-left:auto;background:var(--green)" onclick="archiverM2()">🎓 Clôturer les M2</button>
     </div>
     <div class="table-wrap">
       <div class="table-wrap-title">
@@ -283,17 +314,23 @@
         <span id="nb-inscrits" style="font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--accent)">—</span>
       </div>
       <table class="data-table">
-        <thead><tr><th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th><th>Filière</th><th>Niveau</th><th>Moyenne</th><th>Actions</th></tr></thead>
-        <tbody id="liste-body"><tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Cliquez sur Actualiser</td></tr></tbody>
+        <thead><tr>
+          <th>Matricule</th><th>Nom & Prénom</th><th>Sexe</th>
+          <th>Filière</th><th>Niveau</th><th>Moyenne /100</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="liste-body">
+          <tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Cliquez sur Actualiser</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
 </main>
 
-<div class="overlay" id="edit-overlay" onclick="if(event.target===this) document.getElementById('edit-overlay').classList.remove('show')">
+<!-- Modal modification -->
+<div class="overlay" id="edit-overlay" onclick="if(event.target===this)document.getElementById('edit-overlay').classList.remove('show')">
   <div class="modal">
     <div class="modal-hdr">
-      <div class="modal-title">Modifier la fiche étudiante</div>
+      <div class="modal-title">✏️ Modifier la fiche étudiante</div>
       <button class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('show')">✕</button>
     </div>
     <input type="hidden" id="edit-id">
@@ -309,12 +346,18 @@
       <div class="form-group">
         <label class="form-label">Filière</label>
         <select class="form-select" id="edit-filiere">
-          <option>Informatique</option><option>Mathématiques</option><option>Physique</option><option>Économie</option><option>Droit</option>
+          <option>Informatique</option><option>Mathématiques</option>
+          <option>Physique</option><option>Économie</option><option>Droit</option>
         </select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Niveau</label><select class="form-select" id="edit-niveau"><option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option></select></div>
+      <div class="form-group">
+        <label class="form-label">Niveau</label>
+        <select class="form-select" id="edit-niveau">
+          <option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option>
+        </select>
+      </div>
       <div class="form-group"><label class="form-label">Âge</label><input class="form-input" type="number" id="edit-age"></div>
     </div>
     <button class="btn btn-primary btn-full" onclick="sauvegarderModification()">💾 Enregistrer les modifications</button>
@@ -324,224 +367,265 @@
 <div id="toast"></div>
 <script src="api.js"></script>
 <script>
-// ─── TAB ──────────────────────────────────────────────────────────
+
+// ── TABS ──────────────────────────────────────────────────────
 function switchTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-  if (name==='session'||name==='resultat'||name==='ancien') chargerSelectEtudiants();
-  if (name==='liste') chargerListe();
+  document.getElementById('tab-' + name).classList.add('active');
+  if (['session','resultat','ancien'].includes(name)) chargerSelectEtudiants();
+  if (name === 'liste') chargerListe();
 }
 
-// ─── CHARGER ÉTUDIANTS DANS LES SELECTS ──────────────────────────
+// ── SELECT ÉTUDIANTS ──────────────────────────────────────────
 async function chargerSelectEtudiants() {
   try {
     const etudiants = await apiGet('/etudiants');
-    const opts = etudiants.map(e=>
+    const opts = etudiants.map(e =>
       `<option value="${e.id_etudiant}">${e.prenom} ${e.nom} (${e.matricule}) — ${e.filiere} ${e.niveau}</option>`
     ).join('');
-    const placeholder = '<option value="">— Sélectionner un étudiant —</option>';
-    ['s-etudiant','r-etudiant','a-etudiant'].forEach(id=>{
+    const ph = '<option value="">— Sélectionner un étudiant —</option>';
+    ['s-etudiant','r-etudiant','a-etudiant'].forEach(id => {
       const el = document.getElementById(id);
-      if(el) el.innerHTML = placeholder + opts;
+      if (el) el.innerHTML = ph + opts;
     });
-  } catch(e) {}
+  } catch(e) { console.warn('Impossible de charger les étudiants', e); }
 }
 
-// ─── ENREGISTREMENT ÉTUDIANT ──────────────────────────────────────
+// ── ENREGISTREMENT ÉTUDIANT ───────────────────────────────────
 async function enregistrerEtudiant() {
-  const nom=document.getElementById('e-nom').value.trim();
-  const prenom=document.getElementById('e-prenom').value.trim();
-  const sexe=document.getElementById('e-sexe').value;
-  const filiere=document.getElementById('e-filiere').value;
-  const niveau=document.getElementById('e-niveau').value;
-  const age=parseInt(document.getElementById('e-age').value);
-  const annee=parseInt(document.getElementById('e-annee').value)||null;
-  if(!nom||!prenom||!age||age<17||age>60){toast('⚠️ Nom, prénom et âge (17–60) requis',true);return;}
+  const nom    = document.getElementById('e-nom').value.trim();
+  const prenom = document.getElementById('e-prenom').value.trim();
+  const sexe   = document.getElementById('e-sexe').value;
+  const filiere= document.getElementById('e-filiere').value;
+  const niveau = document.getElementById('e-niveau').value;
+  const age    = parseInt(document.getElementById('e-age').value);
+  const annee  = parseInt(document.getElementById('e-annee').value) || null;
+
+  if (!nom || !prenom) { toast('⚠️ Nom et prénom requis', true); return; }
+  if (!age || age < 17 || age > 60) { toast('⚠️ Âge invalide (17–60 ans)', true); return; }
+
   try {
-    const res = await apiPost('/etudiants',{nom,prenom,sexe,filiere,niveau,age,annee_inscription:annee});
+    const res = await apiPost('/etudiants', {nom, prenom, sexe, filiere, niveau, age, annee_inscription: annee});
     toast(`✅ ${prenom} ${nom} inscrit — ${res.matricule}`);
-    const rb = document.getElementById('result-etudiant');
-    document.getElementById('result-etudiant-detail').innerHTML = `Matricule généré : <b>${res.matricule}</b>`;
-    rb.classList.add('show');
-    ['e-nom','e-prenom','e-age','e-annee'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('result-etudiant-detail').innerHTML = `Matricule : <b>${res.matricule}</b>`;
+    document.getElementById('result-etudiant').classList.add('show');
+    ['e-nom','e-prenom','e-age','e-annee'].forEach(i => document.getElementById(i).value = '');
     broadcastRefresh('etudiant');
-    chargerSelectEtudiants();
-  } catch(e){toast('❌ Erreur : '+e.message,true);}
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
-// ─── ENREGISTREMENT SESSION ───────────────────────────────────────
+// ── ENREGISTREMENT SESSION ────────────────────────────────────
 async function enregistrerSession() {
-  const id_etudiant=parseInt(document.getElementById('s-etudiant').value);
-  const date=document.getElementById('s-date').value;
-  const heures_etude=parseFloat(document.getElementById('s-heures').value);
-  const heures_sommeil=parseFloat(document.getElementById('s-sommeil').value)||7;
-  const humeur_index=parseInt(document.getElementById('s-humeur').value);
-  if(!id_etudiant||!date||isNaN(heures_etude)){toast('⚠️ Étudiant, date et heures requis',true);return;}
+  const id_etudiant    = parseInt(document.getElementById('s-etudiant').value);
+  const date           = document.getElementById('s-date').value;
+  const heures_etude   = parseFloat(document.getElementById('s-heures').value);
+  const heures_sommeil = parseFloat(document.getElementById('s-sommeil').value) || 7;
+  const humeur_index   = parseInt(document.getElementById('s-humeur').value);
+
+  if (!id_etudiant) { toast('⚠️ Sélectionnez un étudiant', true); return; }
+  if (!date)        { toast('⚠️ Date requise', true); return; }
+  if (isNaN(heures_etude)) { toast('⚠️ Heures d'étude requises', true); return; }
+
   try {
-    await apiPost('/sessions',{id_etudiant,date,heures_etude,heures_sommeil,humeur_index});
-    toast(`✅ Session ${heures_etude}h enregistrée`);
-    ['s-heures','s-sommeil'].forEach(i=>document.getElementById(i).value='');
+    await apiPost('/sessions', {id_etudiant, date, heures_etude, heures_sommeil, humeur_index});
+    toast(`✅ Session de ${heures_etude}h enregistrée`);
+    ['s-heures','s-sommeil'].forEach(i => document.getElementById(i).value = '');
     broadcastRefresh('session');
-  } catch(e){toast('❌ Erreur : '+e.message,true);}
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
-// ─── MULTI-MATIÈRES RÉSULTATS ─────────────────────────────────────
+// ── MATIÈRES — ajout / vidage ─────────────────────────────────
 function ajouterMatiere() {
   const container = document.getElementById('matieres-container');
   const div = document.createElement('div');
   div.className = 'matiere-row';
-  div.style.cssText = 'display:grid; grid-template-columns: 1fr 2fr 1fr 1fr; gap:0.5rem; margin-bottom:0.5rem;';
+  // CORRECTION : seulement 3 colonnes, SANS colonne présence
   div.innerHTML = `
-    <input class="form-input r-code" placeholder="Code (ex: INF101)">
-    <input class="form-input r-nom" placeholder="Nom matière">
-    <input class="form-input r-note" type="number" step="1" min="0" max="100" placeholder="Note /100">
-    <input class="form-input r-presence" type="number" min="0" max="100" placeholder="Prés. %" value="100" readonly style="background:var(--bg2); cursor:not-allowed;">
+    <input class="form-input r-code"
+           placeholder="ex: INF101"
+           style="font-family:'JetBrains Mono',monospace;font-size:0.82rem">
+    <input class="form-input r-nom"
+           placeholder="Nom de la matière">
+    <input class="form-input r-note"
+           type="number"
+           step="0.5"
+           min="0"
+           max="100"
+           placeholder="0–100">
   `;
   container.appendChild(div);
 }
 
+function viderMatieres() {
+  document.querySelectorAll('.matiere-row').forEach(r => r.remove());
+  for (let i = 0; i < 5; i++) ajouterMatiere();
+}
+
+// ── ENREGISTREMENT RÉSULTATS ──────────────────────────────────
 async function enregistrerResultat() {
   const id_etudiant = parseInt(document.getElementById('r-etudiant').value);
-  const session = document.getElementById('r-session').value;
-  
-  if(!id_etudiant){
-    toast('⚠️ Veuillez sélectionner un étudiant', true);
-    return;
-  }
+  const session     = document.getElementById('r-session').value;
 
-  const rows = document.querySelectorAll('.matiere-row');
-  let matieres = [];
-  
-  rows.forEach(r => {
+  if (!id_etudiant) { toast('⚠️ Sélectionnez un étudiant', true); return; }
+
+  const rows    = document.querySelectorAll('.matiere-row');
+  let   matieres = [];
+  let   erreurs  = [];
+
+  rows.forEach((r, idx) => {
     const code = r.querySelector('.r-code').value.trim();
-    const nom = r.querySelector('.r-nom').value.trim();
-    const noteRaw = r.querySelector('.r-note').value;
-    const note = parseFloat(noteRaw);
-    const pres = parseFloat(r.querySelector('.r-presence').value) || 100;
+    const nom  = r.querySelector('.r-nom').value.trim();
+    const noteStr = r.querySelector('.r-note').value;
+    const note = parseFloat(noteStr);
 
-    if (code && !isNaN(note)) {
-      matieres.push({
-        code_matiere: code, 
-        nom_matiere: nom || code, 
-        note_examen: note, 
-        taux_presence: pres
-      });
+    if (!code && !noteStr) return; // ligne vide → ignorée
+
+    if (!code) {
+      erreurs.push(`Ligne ${idx+1} : code manquant`);
+      return;
     }
+    if (noteStr === '' || isNaN(note)) {
+      erreurs.push(`${code} : note manquante`);
+      return;
+    }
+    if (note < 0 || note > 100) {
+      erreurs.push(`${code} : note ${note} hors barème (0–100)`);
+      return;
+    }
+
+    matieres.push({
+      code_matiere:  code,
+      nom_matiere:   nom || code,
+      note_examen:   note,
+      taux_presence: 100   // fixé côté backend, on l'envoie quand même
+    });
   });
 
-  if(matieres.length < 3) {
-    toast('⚠️ Erreur : Saisissez au moins 3 notes valides (0 à 100).', true);
+  if (erreurs.length) {
+    toast('⚠️ ' + erreurs[0], true);
+    return;
+  }
+  if (matieres.length < 5) {
+    toast('⚠️ Minimum 5 matières avec code et note valides', true);
     return;
   }
 
   try {
     await apiPost('/resultats/batch', {id_etudiant, session, matieres});
-    
-    toast(`✅ ${matieres.length} résultats enregistrés sur 100`);
-    
-    const rb = document.getElementById('result-resultat');
-    document.getElementById('result-resultat-detail').innerHTML = `<b>${matieres.length}</b> notes insérées avec succès pour l'étudiant #${id_etudiant}.`;
-    rb.classList.add('show');
-    
-    document.querySelectorAll('.r-note').forEach(input => input.value = '');
+
+    toast(`✅ ${matieres.length} notes enregistrées`);
+
+    const detail = matieres.map(m =>
+      `${m.code_matiere} : <b>${m.note_examen}/100</b>`
+    ).join(' &nbsp;·&nbsp; ');
+    document.getElementById('result-resultat-detail').innerHTML =
+      `<b>${matieres.length}</b> matières · Étudiant #${id_etudiant} · Session ${session}<br>${detail}`;
+    document.getElementById('result-resultat').classList.add('show');
+
+    // Vide les champs de note seulement
+    document.querySelectorAll('.r-note').forEach(i => i.value = '');
     broadcastRefresh('resultat');
-    
+
   } catch(e) {
-    console.error("Erreur API:", e);
-    toast('❌ Erreur Serveur : Vérifiez que le barème 100 est autorisé côté backend.', true);
+    toast('❌ ' + e.message, true);
   }
 }
 
-// ─── ENREGISTREMENT ANCIEN ────────────────────────────────────────
+// ── ENREGISTREMENT ANCIEN ─────────────────────────────────────
 async function enregistrerAncien() {
-  const id_etudiant=parseInt(document.getElementById('a-etudiant').value);
-  const cause=document.getElementById('a-cause').value;
-  const annee_depart=parseInt(document.getElementById('a-annee').value)||null;
-  const commentaire=document.getElementById('a-note').value.trim();
-  if(!id_etudiant){toast('⚠️ Sélectionnez un étudiant',true);return;}
+  const id_etudiant  = parseInt(document.getElementById('a-etudiant').value);
+  const cause        = document.getElementById('a-cause').value;
+  const annee_depart = parseInt(document.getElementById('a-annee').value) || null;
+  const commentaire  = document.getElementById('a-note').value.trim();
+
+  if (!id_etudiant) { toast('⚠️ Sélectionnez un étudiant', true); return; }
+
   try {
-    await apiPost('/anciens',{id_etudiant,cause,annee_depart,commentaire});
-    toast(`✅ Départ enregistré`);
-    ['a-annee','a-note'].forEach(i=>document.getElementById(i).value='');
+    await apiPost('/anciens', {id_etudiant, cause, annee_depart, commentaire});
+    toast('✅ Départ enregistré');
+    ['a-annee','a-note'].forEach(i => document.getElementById(i).value = '');
     broadcastRefresh('ancien');
-  } catch(e){toast('❌ Erreur : '+e.message,true);}
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
-// ─── LISTE ÉTUDIANTS (AVEC MODIF / SUPPR) ─────────────────────────
+// ── LISTE ÉTUDIANTS ───────────────────────────────────────────
 let currentList = [];
 
 async function chargerListe() {
-  const filiere=document.getElementById('filtre-filiere').value;
-  const niveau=document.getElementById('filtre-niveau').value;
-  const tbody=document.getElementById('liste-body');
-  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:1.5rem">Chargement…</td></tr>`;
+  const filiere = document.getElementById('filtre-filiere').value;
+  const niveau  = document.getElementById('filtre-niveau').value;
+  const tbody   = document.getElementById('liste-body');
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:1.5rem">Chargement…</td></tr>`;
+
   try {
-    let url='/etudiants';
-    if(filiere) url+=`?filiere=${encodeURIComponent(filiere)}`;
-    const etudiants=await apiGet(url);
-    const filtres=niveau?etudiants.filter(e=>e.niveau===niveau):etudiants;
-    
-    currentList = await Promise.all(filtres.map(async e=>{
-      const res=await apiGet(`/resultats/${e.id_etudiant}`).catch(()=>[]);
-      const moy=res.length?(res.reduce((s,r)=>s+r.note_examen,0)/res.length).toFixed(2):null;
-      return {...e,moy};
+    let url = '/etudiants';
+    if (filiere) url += `?filiere=${encodeURIComponent(filiere)}`;
+    const etudiants = await apiGet(url);
+    const filtres   = niveau ? etudiants.filter(e => e.niveau === niveau) : etudiants;
+
+    currentList = await Promise.all(filtres.map(async e => {
+      const res = await apiGet(`/resultats/${e.id_etudiant}`).catch(() => []);
+      const moy = res.length
+        ? (res.reduce((s, r) => s + r.note_examen, 0) / res.length).toFixed(1)
+        : null;
+      return {...e, moy};
     }));
-    
-    document.getElementById('liste-count').textContent=`${currentList.length} étudiant(s)`;
-    document.getElementById('nb-inscrits').textContent=currentList.length;
-    
-    if(!currentList.length){
-      tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Aucun étudiant trouvé</td></tr>`;
+
+    document.getElementById('liste-count').textContent = `${currentList.length} étudiant(s)`;
+    document.getElementById('nb-inscrits').textContent = currentList.length;
+
+    if (!currentList.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:2rem">Aucun étudiant trouvé</td></tr>`;
       return;
     }
-    
-    tbody.innerHTML=currentList.map(e=>{
-      const moy=e.moy;
-      // Mise à jour de la condition pour une notation sur 100 (succès si >= 50)
-      const statut=moy!=null?(parseFloat(moy)>=50?'badge-success':'badge-danger'):'badge-warn';
+
+    tbody.innerHTML = currentList.map(e => {
+      const s = e.moy != null
+        ? (parseFloat(e.moy) >= 50 ? 'badge-success' : 'badge-danger')
+        : 'badge-warn';
       return `<tr>
         <td><span class="badge badge-info">${e.matricule}</span></td>
         <td><strong>${e.prenom} ${e.nom}</strong></td>
-        <td>${e.sexe||'M'}</td>
+        <td>${e.sexe || 'M'}</td>
         <td>${e.filiere}</td>
         <td><span class="badge badge-warn">${e.niveau}</span></td>
-        <td><span class="badge ${statut}">${moy?moy+'/100':'Aucune note'}</span></td>
+        <td><span class="badge ${s}">${e.moy ? e.moy + '/100' : 'Aucune note'}</span></td>
         <td>
-          <button class="btn btn-ghost" style="padding:0.2rem 0.5rem" onclick="ouvrirEdit(${e.id_etudiant})">✏️</button>
-          <button class="btn btn-ghost" style="padding:0.2rem 0.5rem;color:var(--red)" onclick="supprimerEtudiant(${e.id_etudiant})">🗑️</button>
+          <button class="btn btn-ghost" style="padding:0.2rem 0.6rem" onclick="ouvrirEdit(${e.id_etudiant})">✏️</button>
+          <button class="btn btn-ghost" style="padding:0.2rem 0.6rem;color:var(--red)" onclick="supprimerEtudiant(${e.id_etudiant})">🗑️</button>
         </td>
       </tr>`;
     }).join('');
-  } catch(e){
-    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--red);padding:2rem">⚠️ Erreur : ${e.message}</td></tr>`;
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--red);padding:2rem">⚠️ ${e.message}</td></tr>`;
   }
 }
 
-// ─── ACTIONS ──────────────────────────────────────────────────────
+// ── MODIFIER / SUPPRIMER ──────────────────────────────────────
 function ouvrirEdit(id) {
-  const e = currentList.find(x=>x.id_etudiant===id);
-  if(!e) return;
-  document.getElementById('edit-id').value = e.id_etudiant;
-  document.getElementById('edit-nom').value = e.nom;
-  document.getElementById('edit-prenom').value = e.prenom;
-  document.getElementById('edit-sexe').value = e.sexe||'M';
+  const e = currentList.find(x => x.id_etudiant === id);
+  if (!e) return;
+  document.getElementById('edit-id').value      = e.id_etudiant;
+  document.getElementById('edit-nom').value     = e.nom;
+  document.getElementById('edit-prenom').value  = e.prenom;
+  document.getElementById('edit-sexe').value    = e.sexe || 'M';
   document.getElementById('edit-filiere').value = e.filiere;
-  document.getElementById('edit-niveau').value = e.niveau;
-  document.getElementById('edit-age').value = e.age;
+  document.getElementById('edit-niveau').value  = e.niveau;
+  document.getElementById('edit-age').value     = e.age;
   document.getElementById('edit-overlay').classList.add('show');
 }
 
 async function sauvegarderModification() {
   const id = document.getElementById('edit-id').value;
   const data = {
-    nom: document.getElementById('edit-nom').value,
+    nom:    document.getElementById('edit-nom').value,
     prenom: document.getElementById('edit-prenom').value,
-    sexe: document.getElementById('edit-sexe').value,
-    filiere: document.getElementById('edit-filiere').value,
+    sexe:   document.getElementById('edit-sexe').value,
+    filiere:document.getElementById('edit-filiere').value,
     niveau: document.getElementById('edit-niveau').value,
-    age: parseInt(document.getElementById('edit-age').value)
+    age:    parseInt(document.getElementById('edit-age').value)
   };
   try {
     await apiPut(`/etudiants/${id}`, data);
@@ -549,36 +633,36 @@ async function sauvegarderModification() {
     document.getElementById('edit-overlay').classList.remove('show');
     chargerListe();
     broadcastRefresh('etudiant');
-  } catch(e){toast('❌ '+e.message,true);}
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
 async function supprimerEtudiant(id) {
-  if(!confirm("Voulez-vous vraiment supprimer cet étudiant et TOUTES ses données académiques ?")) return;
+  if (!confirm('Supprimer cet étudiant et toutes ses données ?')) return;
   try {
     await apiDelete(`/etudiants/${id}`);
     toast('✅ Étudiant supprimé');
     chargerListe();
     broadcastRefresh('etudiant');
-  } catch(e){toast('❌ Erreur de suppression',true);}
+  } catch(e) { toast('❌ Erreur de suppression', true); }
 }
 
 async function archiverM2() {
-  if(!confirm("Ceci clôturera le parcours des étudiants de M2. Ceux avec une moyenne > 50 seront validés, les autres signalés en échec. Confirmer ?")) return;
+  if (!confirm('Clôturer les M2 ? Moyenne ≥ 50 → diplômé, sinon échec.')) return;
   try {
     const res = await apiPost('/etudiants/archiver-m2', {});
     toast(`🎓 ${res.message}`);
     chargerListe();
     broadcastRefresh('etudiant');
-  } catch(e){toast('❌ '+e.message,true);}
+  } catch(e) { toast('❌ ' + e.message, true); }
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────
-document.getElementById('s-date').value=new Date().toISOString().split('T')[0];
+// ── INIT ──────────────────────────────────────────────────────
+document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
 
-(async()=>{
-  for(let i=0; i<5; i++) ajouterMatiere();
+(async () => {
+  for (let i = 0; i < 5; i++) ajouterMatiere();
   await checkAPI();
-  if(API_OK) chargerSelectEtudiants();
+  if (API_OK) chargerSelectEtudiants();
 })();
 </script>
 </body>
